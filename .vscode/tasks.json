@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-debug",
+      "type": "shell",
+      "command": "cmake -S . -B build-debug ; cmake --build build-debug -- -j8",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      }
+    }
+  ]
+}

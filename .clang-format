@@ -1,0 +1,29 @@
+﻿---
+BasedOnStyle: Mozilla
+AlignConsecutiveMacros: 'true'
+AlignEscapedNewlines: DontAlign
+AlignOperands: 'true'
+AllowAllArgumentsOnNextLine: 'true'
+AllowShortBlocksOnASingleLine: 'false'
+AllowShortCaseLabelsOnASingleLine: 'false'
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: 'false'
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+AlwaysBreakTemplateDeclarations: 'Yes'
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Allman
+BreakConstructorInitializers: BeforeColon
+ColumnLimit: '120'
+Language: Cpp
+NamespaceIndentation: None
+PenaltyBreakTemplateDeclaration: '0'
+SpaceAfterCStyleCast: 'false'
+SpaceInEmptyParentheses: 'true'
+SpacesInCStyleCastParentheses: 'false'
+Standard: Auto
+TabWidth: '2'
+UseTab: Never
+
+...

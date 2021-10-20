@@ -1,0 +1,26 @@
+{% set version = "0.0.0" %} #TODO
+
+package:
+  name: cpp-app
+  version: {{ version }}
+
+source:
+  git_url: https://github.com/tlemane/cpp-app-template #TODO
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - make
+    - cmake
+
+#  host:
+#   -
+
+#  run:
+#   -
+
+about:
+  home: https://github.com/tlemane/cpp-app-template #TODO
+  license: AGPL-3.0
+  dev_url: https://github.com/tlemane/cpp-app-template #TODO
+  doc_url: https://github.com/tlemane/cpp-app-template #TODO

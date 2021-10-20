@@ -1,0 +1,6 @@
+macro(configure_file_helper INFILE OUTPUT_DIR)
+  get_filename_component(FILENAME ${INFILE} NAME)
+  get_filename_component(OUTPUT_FILE ${FILENAME} NAME_WE)
+  configure_file(${INFILE} ${OUTPUT_DIR}/${OUTPUT_FILE}.hpp)
+  include_directories("${PROJECT_BINARY_DIR}/include/")
+endmacro()
