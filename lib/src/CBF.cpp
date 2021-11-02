@@ -1,12 +1,12 @@
 #include <assert.h>
 #include <math.h>  // TODO remove ?
+#include <xxhash64.h>
 
 #include <cstring>
 #include <fimpera-lib/CBF.hpp>
 #include <fimpera-lib/files.hpp>
 #include <iostream>
 
-#include "../../thirdparty/xxhash/xxhash64.h"  //TODO
 namespace countingBF {
 
 uint64_t CBF::getIndex(const std::string& kmer) const {
@@ -32,11 +32,6 @@ CBF::CBF(int nbBits, int nbBuckets) : _bits(nbBits, false), _nbBuckets(nbBuckets
 }
 
 CBF::CBF(std::ifstream& fin) {
-    // std::vector<bool> _bits;
-    // uint64_t _nbBuckets;
-    // uint64_t _nbCells;
-    // uint64_t _limitValueInBucket;
-
     _nbBuckets = getFromFile<uint64_t>(fin);
     _nbCells = getFromFile<uint64_t>(fin);
     _limitValueInBucket = pow(2, _nbBuckets) - 1;

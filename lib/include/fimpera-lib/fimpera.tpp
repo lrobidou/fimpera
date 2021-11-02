@@ -1,7 +1,6 @@
 #pragma once
 #include <fimpera-lib/fimpera.hpp>
-
-#include "../../../thirdparty/zstr/src/zstr.hpp"  //TODO
+#include <zstr.hpp>  //TODO
 // #include <zstd.hpp>
 
 #include <fimpera-lib/finderec.hpp>
@@ -49,15 +48,12 @@ template <typename T>
 fimpera<T>::fimpera(const std::string& filename) {
     std::ifstream fin(filename, std::ios::out | std::ofstream::binary);
 
-    std::string thuisuuid = getFromFile<std::string>(fin);
+    std::string thuisuuid = getFromFile<std::string>(fin);  //TODO check uuid
     std::string desc = getFromFile<std::string>(fin);
     _k = getFromFile<unsigned int>(fin);
     _z = getFromFile<unsigned int>(fin);
     _canonical = getFromFile<bool>(fin);
     _filter = T(fin);
-
-    // std::cout << thuisuuid << std::endl;
-    // std::cout << desc << std::endl;
 }
 
 template <typename T>
@@ -76,7 +72,7 @@ void fimpera<T>::query(const std::string& filename, CustomResponse& response) co
 
 template <typename T>
 void fimpera<T>::save(const std::string& filename) const {
-    std::string desc = "fimpera index version 0. は. ";  //TODO move
+    std::string desc = "fimpera index version 0. は. ";  //TODO move // TODO change desc
 
     // open the file
     std::ofstream fout(filename, std::ios::out | std::ofstream::binary);
