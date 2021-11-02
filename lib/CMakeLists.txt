@@ -1,6 +1,6 @@
 file(GLOB_RECURSE LIBRARY_HEADERS "*.hpp")
 file(GLOB_RECURSE LIBRARY_SOURCES "*.cpp")
-set(LIBRARY_INCLUDE ${PROJECT_SOURCE_DIR}/lib/include)
+set(LIBRARY_INCLUDE ${PROJECT_SOURCE_DIR}/lib/include ${PROJECT_SOURCE_DIR}/thirdparty/zstr/src)
 
 add_library(${LIBRARY_NAME} ${LIBRARY_SOURCES})
 add_dependencies(${LIBRARY_NAME} ${LIB_DEPENDENCIES})
