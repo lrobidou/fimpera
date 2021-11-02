@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.13.0)
-project(cpp-app VERSION 0.0.1 LANGUAGES C CXX) #TODO
+project(fimpera VERSION 0.0.1 LANGUAGES C CXX) #TODO
 
-set(PROJECT_DESCRIPTION "cpp-app description") #TODO
+set(PROJECT_DESCRIPTION "") #TODO
 
-set(LIBRARY_NAME "cpp-app-lib") #TODO
+set(LIBRARY_NAME "fimpera-lib")
 
 option(STATIC_BUILD "Static build." OFF)
 option(DEV_BUILD "Dev build." OFF)
@@ -40,11 +40,22 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS} -O0 -g -DNDEBUG")
 set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAG} -O2 -g -DNDEBUG")
 set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS} -O0 -g --coverage")
 
+include_directories(SYSTEM /usr/include)
+include_directories(SYSTEM thirdparty/robinHoodHashing/src/include)  # TODO move
+
 add_subdirectory(thirdparty)
+
 get_sha1(${PROJECT_SOURCE_DIR} GIT_SHA1)
-configure_file_helper("${PROJECT_SOURCE_DIR}/lib/include/config.hpp.in" ${PROJECT_BINARY_DIR}/include/cpp-app-lib) #TODO
+
+configure_file_helper("${PROJECT_SOURCE_DIR}/lib/include/config.hpp.in" ${PROJECT_BINARY_DIR}/include/fimpera-lib)
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+foreach(dir ${dirs})
+  message(STATUS "dir2='${dir}'")
+endforeach()
 
 add_subdirectory(lib)
+
+
 
 add_subdirectory(app)
 
