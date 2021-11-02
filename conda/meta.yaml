@@ -5,7 +5,7 @@ package:
   version: {{ version }}
 
 source:
-  git_url: https://github.com/tlemane/cpp-app-template #TODO
+  git_url: https://github.com/lrobidou/fimpera
 
 requirements:
   build:
@@ -20,7 +20,7 @@ requirements:
 #   -
 
 about:
-  home: https://github.com/tlemane/cpp-app-template #TODO
+  home: https://github.com/lrobidou/fimpera
   license: AGPL-3.0
-  dev_url: https://github.com/tlemane/cpp-app-template #TODO
-  doc_url: https://github.com/tlemane/cpp-app-template #TODO
+  dev_url: https://github.com/lrobidou/fimpera
+  doc_url: https://github.com/lrobidou/fimpera

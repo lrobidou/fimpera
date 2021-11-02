@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-MAINTAINER Téo Lemane teo.lemane@inria.fr #TODO
+MAINTAINER Lucas Robidou lucas.robidou@inria.fr
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -9,15 +9,15 @@ RUN apt-get update && apt-get -y dist-upgrade \
 RUN apt-get install -y git cmake gcc g++
 
 RUN cd /opt \
-    && git clone --recursive https://github.com/tlemane/cpp-app-template \ #TODO
+    && git clone --recursive https://github.com/lrobidou/fimpera \
     && cd kmdiff \
     && mkdir build \
     && cd build \
     && cmake .. -DMAX_K=64 -DWITH_MODULES=ON -DWITH_HOWDE=ON -DWITH_SOCKS=ON \
     && make -j8
 
-RUN cd /opt/cpp-app-template && chmod +x ./bin/* #TODO
+RUN cd /opt/fimpera && chmod +x ./bin/*
 
 WORKDIR /tmp
 
-ENTRYPOINT ["/opt/cpp-app-template/bin/cpp-app"] #TODO
+ENTRYPOINT ["/opt/fimpera/bin/fimpera"]

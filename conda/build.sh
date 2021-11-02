@@ -8,4 +8,4 @@ cd ..
 
 mkdir -p $PREFIX/bin
 
-cp -r ./bin/cpp-app $PREFIX/bin #TODO
+cp -r ./bin/fimpera $PREFIX/bin

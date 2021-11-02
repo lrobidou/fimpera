@@ -4,13 +4,13 @@ function project_build ()
 {
   echo "Type=${1}, Tests=${2}, Static=${3}, Dev=${4}, j=${5}"
 
-  mkdir build
+  mkdir -p build
   cd build
 
   cmake .. -DCMAKE_BUILD_TYPE=${1} \
            -DWITH_TESTS=${2} \
            -DSTATIC_BUILD=${3} \
-           -DDEV_BUILD="${4}" \
+           -DDEV_BUILD="${4}"
   make -j${5}
 
   if [[ ${6} == 1 && $? == 0 ]]; then
@@ -20,7 +20,7 @@ function project_build ()
 
 function usage ()
 {
-  echo "cpp-app build script." #TODO
+  echo "fimpera build script."
   echo "Usage: "
   echo "  ./install.sh [-r str] [-t int] [-j int] [-d] [-s]"
   echo "Options: "

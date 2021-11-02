@@ -1,9 +1,9 @@
-# cpp-app-template
+# fimpera
 
-[![cpp-app](https://github.com/tlemane/cpp-app-template/actions/workflows/ci.yml/badge.svg)](https://github.com/tlemane/cpp-app-template/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/tlemane/cpp-app-template/branch/master/graph/badge.svg?token=CXO15KTTYE)](https://codecov.io/gh/tlemane/cpp-app-template)
+[![cpp-app](https://github.com/lrobidou/fimpera/actions/workflows/ci.yml/badge.svg)](https://github.com/lrobidou/fimpera/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/lrobidou/fimpera/branch/master/graph/badge.svg?token=CXO15KTTYE)](https://codecov.io/gh/lrobidou/fimpera)
 
-A c++ project template.
+TODO
 
 ## Features
 
@@ -113,7 +113,7 @@ Produces an archive `<build_dir>/<app_name>-vX.Y.Z-bin-<system>.tar.gz` with:
 
 #### Code coverage
 
-* Automatic report on [CodeCov](https://app.codecov.io/gh/tlemane/cpp-app-template/).
+* Automatic report on [CodeCov](https://app.codecov.io/gh/lrobidou/fimpera/).
 * Requires to add `CODECOV_TOKEN` in repository's secrets.
 
 #### Automatic release

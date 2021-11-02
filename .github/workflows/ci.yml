@@ -1,4 +1,4 @@
-name: cpp-app #TODO
+name: fimpera
 
 on:
   [push]
@@ -66,47 +66,47 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ${{runner.workspace}}/build/coverage_reports.info
 
-      - name: Package
-        if: matrix.compiler == 'g++-10' && matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
-        shell: bash
-        run: cd build && make package
+      # - name: Package
+      #   if: matrix.compiler == 'g++-10' && matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
+      #   shell: bash
+      #   run: cd build && make package
 
-      - name: Get tag name
-        if: matrix.compiler == 'g++-10' && matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
-        id: tag
-        run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
+      # - name: Get tag name
+      #   if: matrix.compiler == 'g++-10' && matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
+      #   id: tag
+      #   run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
 
-      - name: Release archive
-        if: matrix.compiler == 'g++-10' && matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
-        shell: bash
-        run: |
-          mkdir archive_files
-          bash scripts/git-archive-all.sh --format tar.gz ./archive_files/cpp-app-${{ steps.tag.outputs.TAG }}-sources.tar.gz #TODO
-          mv build/cpp-app-${{ steps.tag.outputs.TAG }}-bin-Linux.tar.gz archive_files #TODO
+      # - name: Release archive
+      #   if: matrix.compiler == 'g++-10' && matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
+      #   shell: bash
+      #   run: |
+      #     mkdir archive_files
+      #     bash scripts/git-archive-all.sh --format tar.gz ./archive_files/fimpera-${{ steps.tag.outputs.TAG }}-sources.tar.gz
+      #     mv build/fimpera-${{ steps.tag.outputs.TAG }}-bin-Linux.tar.gz archive_files
 
-      - name: Changelog
-        if: matrix.compiler == 'g++-10' && matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
-        id: changelog
-        shell: bash
-        run: |
-          r=$(cat docs/changelogs/${{ steps.tag.outputs.TAG }}.md)
-          r="${r//'%'/'%25'}"
-          r="${r//$'\n'/'%0A'}"
-          r="${r//$'\r'/'%0D'}"
-          echo "::set-output name=RELEASE_BODY::$r"
+      # - name: Changelog
+      #   if: matrix.compiler == 'g++-10' && matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
+      #   id: changelog
+      #   shell: bash
+      #   run: |
+      #     r=$(cat docs/changelogs/${{ steps.tag.outputs.TAG }}.md)
+      #     r="${r//'%'/'%25'}"
+      #     r="${r//$'\n'/'%0A'}"
+      #     r="${r//$'\r'/'%0D'}"
+      #     echo "::set-output name=RELEASE_BODY::$r"
 
-      - name: Release
-        if: matrix.compiler == 'g++-10' && matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
-        uses: svenstaro/upload-release-action@v2
-        with:
-          release_name: Release ${{ steps.tag.outputs.TAG }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: 'archive_files/*'
-          file_glob: true
-          tag: ${{ github.ref }}
-          body: |
-            ${{ steps.changelog.outputs.RELEASE_BODY }}
-          prerelease: true
+      # - name: Release
+      #   if: matrix.compiler == 'g++-10' && matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     release_name: Release ${{ steps.tag.outputs.TAG }}
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: 'archive_files/*'
+      #     file_glob: true
+      #     tag: ${{ github.ref }}
+      #     body: |
+      #       ${{ steps.changelog.outputs.RELEASE_BODY }}
+      #     prerelease: true
 
 
   MacOS:
@@ -140,33 +140,33 @@ jobs:
         shell: bash
         run: cd build && ctest --verbose
 
-      - name: Package
-        if: matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
-        shell: bash
-        run: cd build && make package
+      # - name: Package
+      #   if: matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
+      #   shell: bash
+      #   run: cd build && make package
 
-      - name: Get tag name
-        if: matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
-        id: tag
-        run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
+      # - name: Get tag name
+      #   if: matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
+      #   id: tag
+      #   run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
 
-      - name: Release archive
-        if: matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
-        shell: bash
-        run: |
-          mkdir archive_files
-          mv build/cpp-app-${{ steps.tag.outputs.TAG }}-bin-Darwin.tar.gz archive_files #TODO
+      # - name: Release archive
+      #   if: matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
+      #   shell: bash
+      #   run: |
+      #     mkdir archive_files
+      #     mv build/fimpera-${{ steps.tag.outputs.TAG }}-bin-Darwin.tar.gz archive_files #TODO
 
-      - name: Release
-        if: matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
-        uses: svenstaro/upload-release-action@v2
-        with:
-          release_name: Release ${{ steps.tag.outputs.TAG }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: 'archive_files/*'
-          file_glob: true
-          tag: ${{ github.ref }}
-          prerelease: true
+      # - name: Release
+      #   if: matrix.build_type == 'Release' && startsWith(github.event.ref, 'refs/tags/v')
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     release_name: Release ${{ steps.tag.outputs.TAG }}
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: 'archive_files/*'
+      #     file_glob: true
+      #     tag: ${{ github.ref }}
+      #     prerelease: true
 
   Coverage:
     runs-on: ubuntu-20.04
