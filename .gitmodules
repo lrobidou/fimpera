@@ -4,3 +4,15 @@
 [submodule "thirdparty/spdlog"]
 	path = thirdparty/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "thirdparty/xxhash"]
+	path = thirdparty/xxhash
+	url = https://github.com/stbrumme/xxhash
+[submodule "thirdparty/zstr"]
+	path = thirdparty/zstr
+	url = https://github.com/mateidavid/zstr
+[submodule "thirdparty/robinHoodHashing"]
+	path = thirdparty/robinHoodHashing
+	url = https://github.com/martinus/robin-hood-hashing
+[submodule "thirdparty/cxxopts"]
+	path = thirdparty/cxxopts
+	url = https://github.com/jarro2783/cxxopts
