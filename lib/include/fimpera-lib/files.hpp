@@ -86,19 +86,3 @@ inline std::string getFromFile<std::string>(std::ifstream& fin) {  //TODO move
     }
     return s;
 }
-
-// class FileWriter {
-//    private:
-//     const std::string _filename;
-
-//    public:
-//     FileWriter(const std::string filename) : _filename(filename) {}
-
-//     template <typename T, typename... Args>
-//     void write(T t, Args... args) {
-//         writeToFile(T);
-//         this->
-//     }
-
-//     ~FileWriter();
-// };
