@@ -32,3 +32,8 @@
 *.app
 
 /build/
+/data/
+.coverage
+*.idx
+lcov.info
+.vscode
