@@ -8,9 +8,6 @@
 
 #include "args.hpp"
 
-// TODO mandatory desc with:
-// name, version, git link
-
 // TODO check uuid
 
 class ResultGetter : public CustomResponse {
@@ -55,9 +52,10 @@ class TruthInTheShapeOfAnAMQ {
         // compute new value of data
         if (data < occurrence) {
             data = occurrence;
-            if (data > _limitValueInBucket) {
-                data = _limitValueInBucket;
-            }
+            // TODO discuss with Pierre
+            // if (data > _limitValueInBucket) {
+            //     data = _limitValueInBucket;
+            // }
         }
 
         auto it = _t.find(x);
@@ -79,52 +77,64 @@ class TruthInTheShapeOfAnAMQ {
     }
 };
 
+void compareWithTruth(const std::string& indexFilename, const std::string& KMCFilename, const std::string& queryFile, uint64_t size, uint64_t nbBuckets) {  // TODO move to an evaluation module
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(indexFilename);
+    std::cout << "re loaded" << std::flush << std::endl;
+    fimpera<TruthInTheShapeOfAnAMQ> fTruth = fimpera<TruthInTheShapeOfAnAMQ>(KMCFilename, f.getK(), f.getz(), f.getCanonical(), size, nbBuckets);
+
+    ResultGetter result_getter = ResultGetter();
+    ResultGetter result_getter_truth = ResultGetter();
+
+    f.query(queryFile, result_getter);
+    fTruth.query(queryFile, result_getter_truth);
+
+    std::vector<int> amq = result_getter.getResult();
+    std::vector<int> truth = result_getter_truth.getResult();
+
+    assert(amq.size() == truth.size());
+
+    int tp = 0;
+    int tn = 0;
+    int fp = 0;
+    int fn = 0;
+
+    for (int i = 0; i < amq.size(); i++) {
+        if (truth[i]) {
+            if (amq[i]) {
+                tp++;
+            } else {
+                fn++;
+            }
+        } else {
+            if (amq[i]) {
+                fp++;
+            } else {
+                tn++;
+            }
+        }
+    }
+    std::cout << "fpr= " << ((double)fp) / ((double)(fp + tn)) << std::endl;
+}
+
+void index(const std::string& filename, const unsigned int& K, const unsigned int& z, uint64_t size, uint64_t nbBuckets, const std::string& destination) {
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, K, z, false, size, nbBuckets);  //TODO canonical
+    f.save(destination);
+}
+
 int main(int argc, char* argv[]) {
-    int nbBuckets = 1;
-    int size = 19495706 * nbBuckets;  // 19495706 -> 5%
+    uint64_t nbBuckets = 1;
+    uint64_t size = 19495706 * nbBuckets;  // 19495706 -> 5%
     int K = 35;
     int z = 5;  // bucket 1 0.000467051%,  5: 0.000467051%
-    std::string queryFile = "tests/unit/data/1millionLinesTest.txt";
-    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(queryFile, K, z, false, size, nbBuckets);
-    // fimpera<TruthInTheShapeOfAnAMQ> fTruth = fimpera<TruthInTheShapeOfAnAMQ>(queryFile, K, z, false, size, nbBuckets);
+    std::string fileToIndex = "xxx/35merlists.txt";
+    std::string destination = "destination.idx";
+    std::string queryFile = "xxx";
 
-    // f.queread("AAAAAAAACAGCGTTATCCGGAGATGAAGAAAGCA", result_getter);
-
-    // ResultGetter result_getter = ResultGetter();
-    // ResultGetter result_getter_truth = ResultGetter();
-
-    // f.query("data/bio/ecoli1.fasta", result_getter);
-    // // f.save("test.idx");
-    // fTruth.query("data/bio/ecoli1.fasta", result_getter_truth);
-
-    // std::vector<int> amq = result_getter.getResult();
-    // std::vector<int> truth = result_getter_truth.getResult();
-
-    // assert(amq.size() == truth.size());
-
-    // int tp = 0;
-    // int tn = 0;
-    // int fp = 0;
-    // int fn = 0;
-
-    // for (int i = 0; i < amq.size(); i++) {
-    //     if (truth[i]) {
-    //         if (amq[i]) {
-    //             tp++;
-    //         } else {
-    //             fn++;
-    //         }
-    //     } else {
-    //         if (amq[i]) {
-    //             fp++;
-    //         } else {
-    //             tn++;
-    //         }
-    //     }
-    // }
-    // std::cout << "fpr= " << ((double)fp) / ((double)(fp + tn)) << std::endl;
-    f.save("save.idx");
-    fimpera<countingBF::CBF> f2 = fimpera<countingBF::CBF>("save.idx");
+    index(fileToIndex, K, z, size, nbBuckets, destination);
+    std::cout << "indexed" << std::flush << std::endl;
+    compareWithTruth(destination, fileToIndex, queryFile, size, nbBuckets);
+    fimpera<countingBF::CBF> f2 = fimpera<countingBF::CBF>(destination);
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(fileToIndex, K, z, false, size, nbBuckets);
     std::cout << (f == f2) << std::endl;
     // char[] msg = "bonjour";
     // std::cout << strlen(msg) << std::endl;
