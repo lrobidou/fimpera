@@ -17,7 +17,8 @@ inline void printVector(T x) {
 }
 
 template <typename T>
-fimpera<T>::fimpera(const std::string& filename, const unsigned int& K, const unsigned int& z, bool canonical, int nbBits, int nbBuckets) : _filter(nbBits, nbBuckets), _canonical(canonical), _k(K - z), _z(z) {
+fimpera<T>::fimpera(const std::string& filename, const unsigned int& K, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets) : _filter(nbBits, nbBuckets), _canonical(canonical), _k(K - z), _z(z) {
+    assert(K >= z);
     if (!fileExists(filename)) {
         std::cout << "The file " << filename << " does not exist." << std::endl;
         exit(1);
@@ -47,12 +48,12 @@ fimpera<T>::fimpera(const std::string& filename, const unsigned int& K, const un
 template <typename T>
 fimpera<T>::fimpera(const std::string& filename) {
     std::ifstream fin(filename, std::ios::out | std::ofstream::binary);
-
-    std::string thuisuuid = getFromFile<std::string>(fin);  //TODO check uuid
+    std::string thisuuid = getFromFile<std::string>(fin);  //TODO check uuid
     std::string desc = getFromFile<std::string>(fin);
     _k = getFromFile<unsigned int>(fin);
     _z = getFromFile<unsigned int>(fin);
     _canonical = getFromFile<bool>(fin);
+    std::string jsonString = getFromFile<std::string>(fin);
     _filter = T(fin);
 }
 
@@ -72,16 +73,49 @@ void fimpera<T>::query(const std::string& filename, CustomResponse& response) co
 
 template <typename T>
 void fimpera<T>::save(const std::string& filename) const {
-    std::string desc = "fimpera index version 0. は. ";  //TODO move // TODO change desc
-
     // open the file
     std::ofstream fout(filename, std::ios::out | std::ofstream::binary);
-
-    writeToFile(fout, fimpera<T>::uuid0, desc, _k, _z, _canonical);
-    _filter.dump(fout);  // write the filter
-
+    // write metadata
+    writeToFile(fout, fimpera<T>::uuid0, fimpera<T>::description, _k, _z, _canonical, "");
+    // write the filter
+    _filter.dump(fout);
+    // flush
     fout.flush();
+    // close
     fout.close();
+}
+
+template <typename T>
+void fimpera<T>::printMetadata(const std::string& filename) {
+    std::ifstream fin(filename, std::ios::out | std::ofstream::binary);
+    std::string thisuuid = getFromFile<std::string>(fin);  //TODO check uuid
+    std::string description = getFromFile<std::string>(fin);
+    unsigned int k = getFromFile<unsigned int>(fin);
+    unsigned int z = getFromFile<unsigned int>(fin);
+    bool canonical = getFromFile<bool>(fin);
+    std::string jsonString = getFromFile<std::string>(fin);
+
+    std::cout << "Reading index " << filename << ":" << std::endl;
+    std::cout << "    " << description << std::endl;
+    std::cout << "    uuid: " << thisuuid << std::endl;
+    std::cout << "    k: " << k << std::endl;
+    std::cout << "    z: " << z << std::endl;
+    // std::cout << "    other: " << thisuuid << std::endl;  //TODO
+}
+
+template <typename T>
+bool fimpera<T>::getCanonical() const {
+    return this->_canonical;
+}
+
+template <typename T>
+unsigned int fimpera<T>::getK() const {
+    return this->_k + this->_z;
+}
+
+template <typename T>
+unsigned int fimpera<T>::getz() const {
+    return this->_z;
 }
 
 template <typename T>
