@@ -53,6 +53,7 @@ fimpera<T>::fimpera(const std::string& filename) {
     _k = getFromFile<unsigned int>(fin);
     _z = getFromFile<unsigned int>(fin);
     _canonical = getFromFile<bool>(fin);
+    std::string jsonStr = getFromFile<std::string>(fin);
     _filter = T(fin);
 }
 
