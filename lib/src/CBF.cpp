@@ -18,14 +18,14 @@ uint64_t CBF::getIndex(const std::string& kmer) const {
 
 int CBF::get(const uint64_t& index) const {
     int data = 0;
-    for (int i = 0; i < _nbBuckets; i++) {
+    for (uint64_t i = 0; i < _nbBuckets; i++) {
         data <<= 1;
         data += _bits[index * _nbBuckets + i];  // TODO gros con
     }
     return data;
 }
 
-CBF::CBF(int nbBits, int nbBuckets) : _bits(nbBits, false), _nbBuckets(nbBuckets) {
+CBF::CBF(uint64_t nbBits, uint64_t nbBuckets) : _bits(nbBits, false), _nbBuckets(nbBuckets) {
     assert(nbBits > 0);
     _nbCells = nbBits / _nbBuckets;
     _limitValueInBucket = pow(2, _nbBuckets) - 1;
@@ -63,12 +63,12 @@ int CBF::set(const std::string& kmer, int occurrence) {
 
     // save data
     std::vector<bool> tmp(_nbBuckets);
-    for (int i = 0; i < _nbBuckets; i++) {
+    for (uint64_t i = 0; i < _nbBuckets; i++) {
         tmp[i] = data % 2;
         data >>= 1;
     }
-    int start = index * _nbBuckets;
-    for (int i = 0; i < _nbBuckets; i++) {
+    uint64_t start = index * _nbBuckets;
+    for (uint64_t i = 0; i < _nbBuckets; i++) {
         _bits[start + i] = tmp[_nbBuckets - 1 - i];
     }
 

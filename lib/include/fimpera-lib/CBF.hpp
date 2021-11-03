@@ -18,7 +18,7 @@ class CBF {
     int get(const uint64_t& index) const;
 
    public:
-    CBF(int nbBits = 100, int nbBuckets = 1);
+    CBF(uint64_t nbBits = 100, uint64_t nbBuckets = 1);
     CBF(std::ifstream& fin);
     int set(const std::string& kmer, int occurrence = 1);
     int get(const std::string& kmer) const;
