@@ -53,7 +53,6 @@ fimpera<T>::fimpera(const std::string& filename) {
     _k = getFromFile<unsigned int>(fin);
     _z = getFromFile<unsigned int>(fin);
     _canonical = getFromFile<bool>(fin);
-    std::string jsonString = getFromFile<std::string>(fin);
     _filter = T(fin);
 }
 
@@ -73,10 +72,11 @@ void fimpera<T>::query(const std::string& filename, CustomResponse& response) co
 
 template <typename T>
 void fimpera<T>::save(const std::string& filename) const {
+    std::string jsonStr = "";
     // open the file
     std::ofstream fout(filename, std::ios::out | std::ofstream::binary);
     // write metadata
-    writeToFile(fout, fimpera<T>::uuid0, fimpera<T>::description, _k, _z, _canonical, "");
+    writeToFile(fout, fimpera<T>::uuid0, fimpera<T>::description, _k, _z, _canonical, jsonStr);
     // write the filter
     _filter.dump(fout);
     // flush
