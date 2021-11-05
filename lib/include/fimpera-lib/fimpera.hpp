@@ -2,8 +2,11 @@
 
 #include <iostream>  //TODO remove
 #include <string>
+#include <tuple>
 
 #include "CustomResponse.hpp"
+#include "files.hpp"
+
 template <typename T>
 class fimpera {
    private:
@@ -19,7 +22,6 @@ class fimpera {
     fimpera(const std::string& filename);
     void query(const std::string& filename, CustomResponse& response) const;
     void save(const std::string& filename) const;
-    static void printMetadata(const std::string& filename);
 
     // getter
     bool getCanonical() const;
@@ -34,10 +36,34 @@ class fimpera {
     ~fimpera();
 };
 
-template <typename T>
-const std::string fimpera<T>::uuid0 = "23e0132d-0e3d-4639-9794-69c2e22a0af4";
+const std::string fimpera_uuid0 = "23e0132d-0e3d-4639-9794-69c2e22a0af4";
 
 template <typename T>
 const std::string fimpera<T>::description = "fimpera index version 0. https://github.com/lrobidou/fimpera";
+
+std::string readUUID(std::ifstream& fin) {
+    return getFromFile<std::string>(fin);  //TODO check uuid
+}
+
+std::tuple<std::string, unsigned int, unsigned int, bool, std::string> getMetadatav0(std::ifstream& fin) {
+    std::string description = getFromFile<std::string>(fin);
+    unsigned int k = getFromFile<unsigned int>(fin);
+    unsigned int z = getFromFile<unsigned int>(fin);
+    bool canonical = getFromFile<bool>(fin);
+    std::string jsonString = getFromFile<std::string>(fin);
+    return {description, k, z, canonical, jsonString};
+}
+
+std::tuple<std::string, std::string, unsigned int, unsigned int, bool, std::string> getMetadata(std::ifstream& fin) {
+    std::string uuid = readUUID(fin);
+    if (uuid == fimpera_uuid0) {
+        auto r = std::tuple_cat(std::make_tuple(uuid), getMetadatav0(fin));
+        return r;
+    } else {
+        std::cerr << "Invalid uuid found when reading index." << std::endl;
+        std::cerr << "uuid is: " << uuid << std::endl;
+        exit(1);
+    }
+}
 
 #include "fimpera.tpp"

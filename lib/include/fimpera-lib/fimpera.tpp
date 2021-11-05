@@ -6,8 +6,6 @@
 #include <fimpera-lib/finderec.hpp>
 #include <fimpera-lib/generators/ReadReader.hpp>
 
-#include "files.hpp"
-
 template <typename T>
 inline void printVector(T x) {
     for (auto const& i : std::as_const(x)) {
@@ -73,35 +71,18 @@ void fimpera<T>::query(const std::string& filename, CustomResponse& response) co
 
 template <typename T>
 void fimpera<T>::save(const std::string& filename) const {
-    std::string jsonStr = "";
+    std::string jsonStr = "";  //TODO add infos of the data structure used to index
+    // TODO make the T have a method to retrieve inner info and add them to the json
     // open the file
     std::ofstream fout(filename, std::ios::out | std::ofstream::binary);
     // write metadata
-    writeToFile(fout, fimpera<T>::uuid0, fimpera<T>::description, _k, _z, _canonical, jsonStr);
+    writeToFile(fout, fimpera_uuid0, fimpera<T>::description, _k, _z, _canonical, jsonStr);
     // write the filter
     _filter.dump(fout);
     // flush
     fout.flush();
     // close
     fout.close();
-}
-
-template <typename T>
-void fimpera<T>::printMetadata(const std::string& filename) {
-    std::ifstream fin(filename, std::ios::out | std::ofstream::binary);
-    std::string thisuuid = getFromFile<std::string>(fin);  //TODO check uuid
-    std::string description = getFromFile<std::string>(fin);
-    unsigned int k = getFromFile<unsigned int>(fin);
-    unsigned int z = getFromFile<unsigned int>(fin);
-    bool canonical = getFromFile<bool>(fin);
-    std::string jsonString = getFromFile<std::string>(fin);
-
-    std::cout << "Reading index " << filename << ":" << std::endl;
-    std::cout << "    " << description << std::endl;
-    std::cout << "    uuid: " << thisuuid << std::endl;
-    std::cout << "    k: " << k << std::endl;
-    std::cout << "    z: " << z << std::endl;
-    // std::cout << "    other: " << thisuuid << std::endl;  //TODO
 }
 
 template <typename T>
