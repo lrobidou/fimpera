@@ -9,11 +9,13 @@ function project_build ()
 
   cmake .. -DCMAKE_BUILD_TYPE=${1} \
            -DWITH_TESTS=${2} \
+           -DWITH_COVERAGE=${2} \
            -DSTATIC_BUILD=${3} \
            -DDEV_BUILD="${4}"
   make -j${5}
-
-  if [[ ${6} == 1 && $? == 0 ]]; then
+  if [[ ${1} == "Coverage" && $? == 0 ]]; then
+    make coverage-report
+  elif [[ ${6} == 1 && $? == 0 ]]; then
     ctest --verbose
   fi
 }
@@ -35,6 +37,7 @@ function usage ()
 
 rel="Release"
 deb="Debug"
+cov="Coverage"
 
 mode="Release"
 dev="OFF"
@@ -49,7 +52,7 @@ while getopts "r:k:t:c:j:onwmsh" option; do
   case "$option" in
     r)
       mode=${OPTARG}
-      [[ ${mode} != ${rel} && ${mode} != ${deb} ]] && usage
+      [[ ${mode} != ${rel} && ${mode} != ${deb} && ${mode} != ${cov} ]] && usage
       ;;
     t)
       tests=${OPTARG}
