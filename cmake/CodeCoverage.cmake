@@ -17,6 +17,6 @@ function(target_coverage target_name runners report_directory)
     COMMAND ${LCOV_BIN} --remove ${report_directory}.info '*/tests/*' '*/thirdparty/*' '*/app/*' '/usr*' --output-file ${report_directory}.info.filtered
     COMMAND ${GENHTML_BIN} -o ${report_directory} ${report_directory}.info.filtered
     COMMAND ${LCOV_BIN} --list ${report_directory}.info.filtered
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/tests)
   add_custom_command(TARGET ${target_name} POST_BUILD COMMENT "Coverage reports generated at ${report_directory}")
 endfunction()
