@@ -1,25 +1,15 @@
 #pragma once
 #include <fimpera-lib/fimpera.hpp>
-#include <zstr.hpp>  //TODO
-// #include <zstd.hpp>
-
 #include <fimpera-lib/finderec.hpp>
 #include <fimpera-lib/generators/ReadReader.hpp>
-
-template <typename T>
-inline void printVector(T x) {
-    for (auto const& i : std::as_const(x)) {
-        std::cout << i << ' ';
-    }
-    std::cout << std::endl;
-}
+#include <zstr.hpp>  //TODO
 
 template <typename T>
 fimpera<T>::fimpera(const std::string& filename, const unsigned int& K, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets) : _filter(nbBits, nbBuckets), _canonical(canonical), _k(K - z), _z(z) {
     assert(K >= z);
     if (!fileExists(filename)) {
-        std::cout << "The file " << filename << " does not exist." << std::endl;
-        exit(1);
+        std::string msg = "The file " + filename + " does not exist.";
+        throw std::runtime_error(msg);
     }
     std::ifstream myFileGz(filename);
     zstr::istream myFile(myFileGz);

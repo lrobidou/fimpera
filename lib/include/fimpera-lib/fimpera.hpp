@@ -57,12 +57,10 @@ inline std::tuple<std::string, unsigned int, unsigned int, bool, std::string> ge
 inline std::tuple<std::string, std::string, unsigned int, unsigned int, bool, std::string> getMetadata(std::ifstream& fin) {
     std::string uuid = readUUID(fin);
     if (uuid == fimpera_uuid0) {
-        auto r = std::tuple_cat(std::make_tuple(uuid), getMetadatav0(fin));
-        return r;
+        return std::tuple_cat(std::make_tuple(uuid), getMetadatav0(fin));
     } else {
-        std::cerr << "Invalid uuid found when reading index." << std::endl;
-        std::cerr << "uuid is: " << uuid << std::endl;
-        exit(1);
+        std::string msg = "Invalid uuid found when reading index. UUID is: " + uuid + " .";
+        throw std::runtime_error(msg);
     }
 }
 
