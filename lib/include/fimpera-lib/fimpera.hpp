@@ -41,11 +41,11 @@ const std::string fimpera_uuid0 = "23e0132d-0e3d-4639-9794-69c2e22a0af4";
 template <typename T>
 const std::string fimpera<T>::description = "fimpera index version 0. https://github.com/lrobidou/fimpera";
 
-std::string readUUID(std::ifstream& fin) {
+inline std::string readUUID(std::ifstream& fin) {
     return getFromFile<std::string>(fin);  //TODO check uuid
 }
 
-std::tuple<std::string, unsigned int, unsigned int, bool, std::string> getMetadatav0(std::ifstream& fin) {
+inline std::tuple<std::string, unsigned int, unsigned int, bool, std::string> getMetadatav0(std::ifstream& fin) {
     std::string description = getFromFile<std::string>(fin);
     unsigned int k = getFromFile<unsigned int>(fin);
     unsigned int z = getFromFile<unsigned int>(fin);
@@ -54,7 +54,7 @@ std::tuple<std::string, unsigned int, unsigned int, bool, std::string> getMetada
     return {description, k, z, canonical, jsonString};
 }
 
-std::tuple<std::string, std::string, unsigned int, unsigned int, bool, std::string> getMetadata(std::ifstream& fin) {
+inline std::tuple<std::string, std::string, unsigned int, unsigned int, bool, std::string> getMetadata(std::ifstream& fin) {
     std::string uuid = readUUID(fin);
     if (uuid == fimpera_uuid0) {
         auto r = std::tuple_cat(std::make_tuple(uuid), getMetadatav0(fin));

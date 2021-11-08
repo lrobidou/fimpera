@@ -8,7 +8,7 @@ add_executable(${TARGET_NAME} ${SRC_FILE})
 add_dependencies(${TARGET_NAME} ${LIB_DEPENDENCIES})
 target_include_directories(${TARGET_NAME} PRIVATE ${TEST_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/tests/unit)
 target_link_directories(${TARGET_NAME} PRIVATE ${TEST_LINK_DIR})
-target_link_libraries(${TARGET_NAME} ${LIBRARY_NAME} ${TEST_LINK} pthread)
+target_link_libraries(${TARGET_NAME} ${LIBRARY_NAME} ${TEST_LINK} pthread z)
 
 add_test(NAME ${TARGET_NAME} COMMAND sh -c "${PROJECT_BINARY_DIR}/tests_bin/${TARGET_NAME}")
 
