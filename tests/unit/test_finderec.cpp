@@ -3,6 +3,28 @@
 #include <fimpera-lib/CBF.hpp>
 #include <fimpera-lib/finderec.hpp>
 
+TEST(fimpera_test_suite_finderec, minElemInWindow) {
+    std::vector<int> v = {
+        0,    // 0
+        4,    // 1
+        5,    // 2
+        6,    // 3
+        1,    // 4
+        2,    // 5
+        3,    // 6
+        7,    // 7
+        8,    // 8
+        5,    // 9
+        112,  // 10
+        6     // 11
+    };
+
+    EXPECT_EQ(minElemInWindow(v, 0, 3), 0);
+    EXPECT_EQ(minElemInWindow(v, 5, 9), 2);
+    EXPECT_EQ(minElemInWindow(v, 2, 9), 1);
+    EXPECT_EQ(minElemInWindow(v, 0, 12), 0);
+}
+
 TEST(fimpera_test_suite_finderec, range_error) {
     int K = 31;
     int z = 0;
