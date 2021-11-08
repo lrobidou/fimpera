@@ -1,7 +1,8 @@
 #pragma once
+#include <assert.h>  //TODO remove
+
 #include <string>
 #include <vector>
-
 template <typename T>
 inline T minElemInWindow(std::vector<T> vect, int iMin, int iMax) {
     T minElem = vect[iMin];
@@ -20,7 +21,7 @@ inline int doQuery(const T& amqc, const std::string& kmer, bool canonical) {
     return amqc.get(kmer);
 }
 
-/**todo refaire description
+/** // TODO refaire description
  * @brief Query using findere.
  * @param filterOrTruth the amq wrapped within a customAMQ
  * @param s the sequence to be queried
@@ -43,6 +44,7 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
     bool extending_stretch = true;
     int thisAnswer = 0;
     std::vector<int> previous_answers;
+    previous_answers.reserve(response.size());
     while (j < size - k + 1) {
         assert(stretchLength == previous_answers.size());
         if (thisAnswer = doQuery(amqc, query.substr(j, k), canonical)) {
@@ -70,9 +72,11 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
         }
     }
     // Last values:
+    // std::cout << "last values" << std::endl;
     if (stretchLength >= z) {
         int i = 0;
         for (unsigned long long t = size - k + 1 - stretchLength; t < size - K + 1; t++) {
+            // std::cout << "t = " << t << std::endl;
             // response[t] = previous_answers[i++];
             response[t] = minElemInWindow(previous_answers, i, i + z + 1);
             i++;
