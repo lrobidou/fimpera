@@ -1,5 +1,3 @@
-#include <assert.h>  //TODO remove
-
 #include <fimpera-lib/CBF.hpp>
 #include <fimpera-lib/fimpera.hpp>
 #include <iostream>
