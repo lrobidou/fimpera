@@ -47,33 +47,18 @@ inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, int 
     int we_go_up_to = ARR.size() % w + 1;
 
     int start_window = (nbWin - 1) * w;
-    int indice = start_window + w - 1;
-    int minimum = ARR[indice];
-
-    min_right[w - 1] = minimum;
-    while (indice > start_window) {  // TODO for
-        indice--;
-        minimum = std::min(minimum, ARR[indice]);
-        min_right[indice - start_window] = minimum;
+    min_right[w - 1] = ARR[start_window + w - 1];
+    for (int indice = start_window + w - 2; indice >= start_window; indice--) {
+        min_right[indice - start_window] = std::min(min_right[indice - start_window + 1], ARR[indice]);
     }
 
     for (int j = 0; j < we_go_up_to - 1; j++) {
         sliding_min[start_window + j] = std::min(min_right[j], min_left);
         min_left = (j == 0) ? ARR[start_window + w + j] : std::min(ARR[start_window + w + j], min_left);
-        // if (j == 0) {
-        //     min_left = ARR[start_window + w + j];
-        // } else {
-        //     if (min_left > ARR[start_window + w + j]) {
-        //         min_left = ARR[start_window + w + j];
-        //     }
-        // }
     }
 
-    if (min_right[we_go_up_to - 1] < min_left) {
-        sliding_min[start_window + we_go_up_to - 1] = min_right[we_go_up_to - 1];
-    } else {
-        sliding_min[start_window + we_go_up_to - 1] = min_left;
-    }
+    sliding_min[start_window + we_go_up_to - 1] = std::min(min_right[we_go_up_to - 1], min_left);
+
     return sliding_min;
 }
 
@@ -83,7 +68,7 @@ inline int doQuery(const T& amqc, const std::string& kmer, bool canonical) {
     return amqc.get(kmer);
 }
 
-/** // TODO refaire description
+/** // TODO redo description
  * @brief Query using findere.
  * @param filterOrTruth the amq wrapped within a customAMQ
  * @param s the sequence to be queried
