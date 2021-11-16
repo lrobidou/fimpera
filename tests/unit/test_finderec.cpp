@@ -198,128 +198,38 @@ TEST(fimpera_test_suite_finderec, test_sliding_window_minimum) {
     EXPECT_EQ(out, expectation);
 }
 
-inline std::vector<int> sliding_window_minimum_dyn(const std::vector<int>& ARR, int w) {
-    std::vector<int> sliding_min = std::vector<int>(ARR.size() - w + 1);
+inline std::vector<int> sliding_window_minimum_pierre(const std::vector<int>& ARR, int K) {
+    std::vector<int> res;
+    res.reserve(ARR.size() - K + 1);
+    int min = ARR[0];
+    int i_min = 0;
 
-    int min_left = ARR[0];
-    std::vector<int> min_right = std::vector<int>(w);
-
-    int nbWin = ARR.size() / w;
-
-    for (int i = 0; i < w; i++) {
-        if (min_left > ARR[i]) {
-            min_left = ARR[i];
+    for (int j = 1; j < K; j++) {
+        if (ARR[j] < min) {
+            min = ARR[j];
+            i_min = j;
         }
     }
+    res.push_back(min);
 
-    for (int i = 0; i < nbWin - 1; i++) {
-        int start_window = i * w;
-        int indice = start_window + w - 1;
-        int minimum = ARR[indice];
-        min_right[w - 1] = minimum;
-        while (indice > start_window) {  // TODO use for
-            indice--;
-            if (minimum > ARR[indice]) {
-                minimum = ARR[indice];
-            }
-            min_right[indice - start_window] = minimum;
-        }
-        for (int j = 0; j < min_right.size(); j++) {
-            std::cout << min_right[j] << " ";
-        }
-        std::cout << std::endl;
-        // on a le min_right
-        for (int j = 0; j < w; j++) {
-            if (min_right[j] < min_left) {
-                sliding_min[i * w + j] = min_right[j];
-            } else {
-                sliding_min[i * w + j] = min_left;
-            }
-            if (j == 0) {
-                min_left = ARR[i * w + w + j];
-            } else {
-                if (min_left > ARR[i * w + w + j]) {
-                    min_left = ARR[i * w + w + j];
+    for (int i = K; i < ARR.size(); i++) {
+        if (i_min == i - K) {
+            i_min = i - K + 1;
+            min = ARR[i_min];
+            for (int j = i - K + 2; j < i; j++) {
+                if (ARR[j] < min) {
+                    i_min = j;
+                    min = ARR[i_min];
                 }
             }
         }
-    }
-
-    // last window
-    int i = nbWin - 1;
-    int we_go_up_to = ARR.size() % w + 1;
-
-    int start_window = i * w;
-    int indice = start_window + w - 1;
-    std::cout << "indice " << indice << std::endl;
-    int minimum = ARR[indice];
-    min_right[w - 1] = minimum;
-    while (indice > start_window) {  // TODO for
-        indice--;
-        if (minimum > ARR[indice]) {
-            minimum = ARR[indice];
+        if (ARR[i] < min) {  // TODO pourquoi ça ne marche pas avec < strict ?
+            i_min = i;
+            min = ARR[i_min];
         }
-        min_right[indice - start_window] = minimum;
+        res.push_back(min);
     }
-
-    for (int j = 0; j < min_right.size(); j++) {
-        std::cout << min_right[j] << " ";
-    }
-    std::cout << std::endl;
-
-    for (int j = 0; j < we_go_up_to; j++) {
-        if (min_right[j] < min_left) {
-            sliding_min[i * w + j] = min_right[j];
-        } else {
-            sliding_min[i * w + j] = min_left;
-        }
-        if (j == 0) {
-            min_left = ARR[i * w + w + j];
-        } else {
-            if (min_left > ARR[i * w + w + j]) {
-                min_left = ARR[i * w + w + j];
-            }
-        }
-    }
-    return sliding_min;
-
-    // // TODO what if size == K ?
-    // for (int i = 0; i < w; i++) {
-    //     min_left[i] = (i % w == 0) ? ARR[i] : std::min(min_left[i - 1], ARR[i]);
-    // }
-
-    // for (int i = 0; i < nbWin; i++) {
-    //     startWin = i * w;
-    //     endWin = (i + 1) * w;
-    //     for (int j = 0; j < w; j++) {
-    //         indice = startWin + j;
-    //         min_left[indice] = (j % w == 0) ? ARR[indice] : std::min(min_left[indice - 1], ARR[indice]);
-
-    //         int k = endWin - 1 - j;
-    //         min_right[k] = (k % w == 0) ? ARR[k] : std::min(min_right[k + 1], ARR[k]);
-    //     }
-    //     for (int j = 0; j < w; j++) {
-    //         indice = i * w + j;
-    //         // sliding_min[indice] = std::min(min_right[indice], min_left[indice + w - 1]);
-    //     }
-    // }
-    // TODO reste
-
-    // int nbLeft = ARR.size() % w;
-    // for (int i = 0; i < nbLeft; i++) {
-    //     indice = nbWin * w + i;
-
-    //     min_left[indice] = (indice % w == 0) ? ARR[indice] : std::min(min_left[indice - 1], ARR[indice]);
-
-    //     int k = ARR.size() - indice - 1;
-    //     min_right[k] = (i % w == 0) ? ARR[k] : std::min(min_right[k + 1], ARR[k]);
-    // }
-
-    // for (int i = 0, j = 0; i + w <= ARR.size(); i++) {
-    //     sliding_min[j++] = std::min(min_right[i], min_left[i + w - 1]);
-    // }
-
-    // return sliding_min;
+    return res;
 }
 
 inline std::vector<int> sliding_window_minimum_naive(const std::vector<int>& ARR, int K) {
@@ -400,17 +310,15 @@ inline std::vector<int> sliding_window_minimum_2(const std::vector<int>& ARR, in
     return result;
 }
 TEST(fimpera_test_suite_finderec, test_sliding_window_minimum_naive) {
-    int size = 30;
-    int window_size = 8;
+    int size = 3000000;
+    int window_size = 3;
 
-    std::vector<int> in = {8, 36, 75, 35, 76, 81, 84, 65, 44, 34, 24, 69, 90, 34, 14, 94, 19, 61, 22, 11, 48, 12, 69, 90, 34, 14, 94, 19, 61, 22, 11, 69, 90, 34, 14, 94, 19, 61, 22, 9, 69, 90, 34, 14, 94, 19, 61, 22, 220};
+    std::vector<int> in;
     in.reserve(size);
     auto [rng, uni] = rd(0, 1000);
-    // for (int i = 0; i < size; i++) {
-    //     in.push_back(uni(rng));
-    //     // std::cout << in[i] << " ";
-    // }
-    // std::cout << std::endl;
+    for (int i = 0; i < size; i++) {
+        in.push_back(uni(rng));
+    }
 
     using namespace std::chrono;
 
@@ -418,13 +326,13 @@ TEST(fimpera_test_suite_finderec, test_sliding_window_minimum_naive) {
     auto start = high_resolution_clock::now();
     const std::vector<int> out0 = sliding_window_minimum_naive(in, window_size);
     auto naive1 = high_resolution_clock::now();
-    const std::vector<int> out1 = sliding_window_minimum(in, window_size);
+    const std::vector<int> out1 = sliding_window_minimum_pierre(in, window_size);
     auto naive2 = high_resolution_clock::now();
     const std::vector<int> out2 = sliding_window_minimum_1(in, window_size);
     auto end_1 = high_resolution_clock::now();
     const std::vector<int> out3 = sliding_window_minimum_2(in, window_size);
     auto end_2 = high_resolution_clock::now();
-    const std::vector<int> out4 = sliding_window_minimum_dyn(in, window_size);
+    const std::vector<int> out4 = sliding_window_minimum(in, window_size);
     auto end_3 = high_resolution_clock::now();
 
     auto duration_naive_1 = duration_cast<microseconds>(naive1 - start).count();
@@ -433,9 +341,9 @@ TEST(fimpera_test_suite_finderec, test_sliding_window_minimum_naive) {
     auto duration_2 = duration_cast<microseconds>(end_2 - end_1).count();
     auto duration_3 = duration_cast<microseconds>(end_3 - end_2).count();
     std::cout << "naive:  " << duration_naive_1 << std::endl;
-    std::cout << "pierre: " << duration_naive_2 << std::endl;
     std::cout << "deque:  " << duration_1 << std::endl;
     std::cout << "tab:    " << duration_2 << std::endl;
+    std::cout << "pierre: " << duration_naive_2 << std::endl;
     std::cout << "dyn:    " << duration_3 << std::endl;
 
     EXPECT_EQ(out0, out1);

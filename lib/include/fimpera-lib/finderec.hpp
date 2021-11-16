@@ -1,8 +1,11 @@
 #pragma once
 #include <assert.h>  //TODO remove
 
+#include <deque>
+#include <iostream>
 #include <string>
 #include <vector>
+
 template <typename T>
 inline T minElemInWindow(std::vector<T> vect, int iMin, int iMax) {
     T minElem = vect[iMin];
@@ -13,6 +16,65 @@ inline T minElemInWindow(std::vector<T> vect, int iMin, int iMax) {
         }
     }
     return minElem;
+}
+
+inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, int w) {
+    std::vector<int> sliding_min = std::vector<int>(ARR.size() - w + 1);
+
+    int min_left = ARR[0];
+    std::vector<int> min_right = std::vector<int>(w);
+
+    int nbWin = ARR.size() / w;
+
+    for (int i = 0; i < w; i++) {
+        min_left = std::min(min_left, ARR[i]);
+    }
+
+    for (int i = 0; i < nbWin - 1; i++) {
+        int start_window = i * w;
+        min_right[w - 1] = ARR[start_window + w - 1];
+        for (int indice = start_window + w - 2; indice >= start_window; indice--) {
+            min_right[indice - start_window] = std::min(min_right[indice - start_window + 1], ARR[indice]);
+        }
+
+        for (int j = 0; j < w; j++) {
+            sliding_min[start_window + j] = std::min(min_right[j], min_left);
+            min_left = (j == 0) ? ARR[start_window + w + j] : std::min(min_left, ARR[start_window + w + j]);
+        }
+    }
+
+    // last window
+    int we_go_up_to = ARR.size() % w + 1;
+
+    int start_window = (nbWin - 1) * w;
+    int indice = start_window + w - 1;
+    int minimum = ARR[indice];
+
+    min_right[w - 1] = minimum;
+    while (indice > start_window) {  // TODO for
+        indice--;
+        minimum = std::min(minimum, ARR[indice]);
+        min_right[indice - start_window] = minimum;
+    }
+
+    for (int j = 0; j < we_go_up_to - 1; j++) {
+        sliding_min[start_window + j] = std::min(min_right[j], min_left);
+        min_left = (j == 0) ? ARR[start_window + w + j] : std::min(ARR[start_window + w + j], min_left);
+        // if (j == 0) {
+        //     min_left = ARR[start_window + w + j];
+        // } else {
+        //     if (min_left > ARR[start_window + w + j]) {
+        //         min_left = ARR[start_window + w + j];
+        //     }
+        // }
+    }
+
+    if (min_right[we_go_up_to - 1] < min_left) {
+        sliding_min[start_window + we_go_up_to - 1] = min_right[we_go_up_to - 1];
+    } else {
+        sliding_min[start_window + we_go_up_to - 1] = min_left;
+    }
+    return sliding_min;
 }
 
 template <typename T>
@@ -72,12 +134,9 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
         }
     }
     // Last values:
-    // std::cout << "last values" << std::endl;
     if (stretchLength >= z) {
         int i = 0;
         for (unsigned long long t = size - k + 1 - stretchLength; t < size - K + 1; t++) {
-            // std::cout << "t = " << t << std::endl;
-            // response[t] = previous_answers[i++];
             response[t] = minElemInWindow(previous_answers, i, i + z + 1);
             i++;
         }

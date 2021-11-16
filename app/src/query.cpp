@@ -139,7 +139,7 @@ std::tuple<int, int, int, int> compareVectors(const std::vector<int>& result, co
 
 void compareWithTruth(const std::string& indexFilename, const std::string& KMCFilename, const std::string& queryFile, uint64_t size, uint64_t nbBuckets) {  // TODO move to an evaluation module
     fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(indexFilename);
-    fimpera<TruthInTheShapeOfAnAMQ> fTruth = fimpera<TruthInTheShapeOfAnAMQ>(KMCFilename, f.getK(), f.getz(), f.getCanonical(), size, nbBuckets);
+    fimpera<TruthInTheShapeOfAnAMQ> fTruth = fimpera<TruthInTheShapeOfAnAMQ>(KMCFilename, f.getK(), 0, f.getCanonical(), size, nbBuckets);
 
     ResultGetter result_getter = ResultGetter();
     ResultGetter result_getter_truth = ResultGetter();
