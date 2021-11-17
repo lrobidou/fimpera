@@ -13,9 +13,10 @@ function project_build ()
            -DSTATIC_BUILD=${3} \
            -DDEV_BUILD="${4}"
   make -j${5}
-  if [[ ${1} == "Coverage" && $? == 0 ]]; then
+  alrighty=$(($? == 0))  # is the return code of make 0 ?
+  if [[ ${1} == "Coverage" && ${alrighty} == 1 ]]; then
     make coverage-report
-  elif [[ ${6} == 1 && $? == 0 ]]; then
+  elif [[ ${6} == 1 && ${alrighty} == 1 ]]; then
     ctest --verbose
   fi
 }
