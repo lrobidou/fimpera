@@ -1,3 +1,4 @@
+# TODO revert the commit that added this line once the project is made publicly available
 name: fimpera
 
 on:
@@ -10,14 +11,15 @@ jobs:
       fail-fast: false
       matrix:
         build_type: [Release, Debug]
-        compiler: [g++-8, g++-9, g++-10]
+        # compiler: [g++-8, g++-9, g++-10]
+        compiler: [g++-10]
         include:
-          - compiler: g++-8
-            cxx: g++-8
-            cc: gcc-8
-          - compiler: g++-9
-            cxx: g++-9
-            cc: gcc-9
+          # - compiler: g++-8
+          #   cxx: g++-8
+          #   cc: gcc-8
+          # - compiler: g++-9
+          #   cxx: g++-9
+          #   cc: gcc-9
           - compiler: g++-10
             cxx: g++-10
             cc: gcc-10
@@ -71,7 +73,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build_type: [Release, Debug]
+        # build_type: [Release, Debug]
+        build_type: [Release]
 
     name: MacOS - ${{ matrix.build_type }}
     steps:
