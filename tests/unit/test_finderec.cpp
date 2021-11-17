@@ -310,8 +310,8 @@ inline std::vector<int> sliding_window_minimum_2(const std::vector<int>& ARR, in
     return result;
 }
 TEST(fimpera_test_suite_finderec, test_sliding_window_minimum_naive) {
-    int size = 3000000;
-    int window_size = 3;
+    int size = 300000;
+    int window_size = 7;
 
     std::vector<int> in;
     in.reserve(size);

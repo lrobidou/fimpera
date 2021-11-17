@@ -18,8 +18,19 @@ inline T minElemInWindow(std::vector<T> vect, int iMin, int iMax) {
     return minElem;
 }
 
+// inspired by http://www.zrzahid.com/sliding-window-minmax/
 inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, int w) {
     std::vector<int> sliding_min = std::vector<int>(ARR.size() - w + 1);
+
+    if (ARR.size() == 0) {
+        return {};
+    }
+    if (w == 0) {
+        return ARR;  // TODO erreur plutot
+    }
+    if (w == 1) {
+        return ARR;
+    }
 
     int min_left = ARR[0];
     std::vector<int> min_right = std::vector<int>(w);
@@ -54,7 +65,7 @@ inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, int 
 
     for (int j = 0; j < we_go_up_to - 1; j++) {
         sliding_min[start_window + j] = std::min(min_right[j], min_left);
-        min_left = (j == 0) ? ARR[start_window + w + j] : std::min(ARR[start_window + w + j], min_left);
+        min_left = (j == 0) ? ARR[start_window + w + j] : std::min(min_left, ARR[start_window + w + j]);
     }
 
     sliding_min[start_window + we_go_up_to - 1] = std::min(min_right[we_go_up_to - 1], min_left);
@@ -68,6 +79,8 @@ inline int doQuery(const T& amqc, const std::string& kmer, bool canonical) {
     return amqc.get(kmer);
 }
 
+// TODO even more tests
+// OPTIMIZE do min in place (expected gain: *2 speed ratio ?)
 /** // TODO redo description
  * @brief Query using findere.
  * @param filterOrTruth the amq wrapped within a customAMQ
@@ -105,12 +118,15 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
             }
         } else {
             if (stretchLength >= z) {
-                int i = 0;
-                for (unsigned long long t = j - stretchLength; t < j - z; t++) {
-                    // response[t] = previous_answers[i++];
-                    response[t] = minElemInWindow(previous_answers, i, i + z + 1);
-                    i++;
+                unsigned long long t = j - stretchLength;
+                for (const auto& minimum : sliding_window_minimum(previous_answers, z + 1)) {
+                    response[t++] = minimum;
                 }
+                // int i = 0;
+                // for (unsigned long long t = j - stretchLength; t < j - z; t++) {
+                //     response[t] = minElemInWindow(previous_answers, i, i + z + 1);
+                //     i++;
+                // }
             }
             previous_answers.clear();
             stretchLength = 0;
@@ -120,12 +136,16 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
     }
     // Last values:
     if (stretchLength >= z) {
-        int i = 0;
-        for (unsigned long long t = size - k + 1 - stretchLength; t < size - K + 1; t++) {
-            response[t] = minElemInWindow(previous_answers, i, i + z + 1);
-            i++;
+        std::vector<int> minimums = sliding_window_minimum(previous_answers, z + 1);
+        unsigned long long t = size - k + 1 - stretchLength;
+        for (const auto& minimum : sliding_window_minimum(previous_answers, z + 1)) {
+            response[t++] = minimum;
         }
-        previous_answers.clear();  //optional
+        // for (unsigned long long t = size - k + 1 - stretchLength; t < size - K + 1; t++) {
+        //     response[t] = minElemInWindow(previous_answers, i, i + z + 1);
+        //     i++;
+        // }
+        // previous_answers.clear();  //optional
     }
 
     return response;
