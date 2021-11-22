@@ -80,3 +80,7 @@ while getopts "r:k:t:c:j:onwmsh" option; do
 done
 
 project_build ${mode} ${tests_str} ${static} ${dev} ${jopt} ${tests_run}
+
+# move bins to bin folder
+mkdir -p ../bin
+cp app/fimpera_index app/fimpera_info app/fimpera_query ../bin
