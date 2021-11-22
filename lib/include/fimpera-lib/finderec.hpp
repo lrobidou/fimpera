@@ -22,8 +22,8 @@ inline T minElemInWindow(std::vector<T> vect, int iMin, int iMax) {
 inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, int w) {
     std::vector<int> sliding_min = std::vector<int>(ARR.size() - w + 1);
 
-    if (ARR.size() == 0) {
-        return {};
+    if (ARR.size() < w) {
+        return {};  // TODO erreur
     }
     if (w == 0) {
         return ARR;  // TODO erreur plutot
@@ -57,12 +57,14 @@ inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, int 
     // last window
     int we_go_up_to = ARR.size() % w + 1;
 
+    // compute last part of min_right
     int start_window = (nbWin - 1) * w;
     min_right[w - 1] = ARR[start_window + w - 1];
     for (int indice = start_window + w - 2; indice >= start_window; indice--) {
         min_right[indice - start_window] = std::min(min_right[indice - start_window + 1], ARR[indice]);
     }
 
+    //
     for (int j = 0; j < we_go_up_to - 1; j++) {
         sliding_min[start_window + j] = std::min(min_right[j], min_left);
         min_left = (j == 0) ? ARR[start_window + w + j] : std::min(min_left, ARR[start_window + w + j]);

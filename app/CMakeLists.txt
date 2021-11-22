@@ -20,3 +20,7 @@ target_link_libraries(fimpera_info ${LIBRARY_NAME} ${APP_LINK} z)
 add_executable(fimpera_query ${APP_SOURCE_DIR}/query.cpp)
 add_dependencies(fimpera_query ${APP_DEPENDENCIES})
 target_link_libraries(fimpera_query ${LIBRARY_NAME} ${APP_LINK} z)
+
+add_executable(fimpera_truth ${APP_SOURCE_DIR}/truth.cpp)
+add_dependencies(fimpera_truth ${APP_DEPENDENCIES})
+target_link_libraries(fimpera_truth ${LIBRARY_NAME} ${APP_LINK} z)
