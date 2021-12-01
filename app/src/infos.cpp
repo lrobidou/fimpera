@@ -1,11 +1,16 @@
 #include <fimpera-lib/CBF.hpp>
 #include <fimpera-lib/fimpera.hpp>
 
-#include "args/infos_args.hpp"
+#include "args.hpp"
 
 int main(int argc, char* argv[]) {
-    cxxopts::ParseResult arguments = parseArgvInfo(argc, argv);
-    const auto& [input_filename] = getArgsInfo(arguments);
+    argparse::ArgumentParser program("fimpera_index", "0.0.1");
+    // mandatory arguments
+    program.add_argument("input_filename").help("index file you want to index");
+
+    parse(program, argc, argv);
+
+    const std::string input_filename = program.get("input_filename");
 
     std::ifstream fin(input_filename, std::ios::out | std::ofstream::binary);
 

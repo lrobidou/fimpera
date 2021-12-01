@@ -4,7 +4,7 @@
 #include <fimpera-lib/CBF.hpp>
 #include <fimpera-lib/fimpera.hpp>
 
-#include "args/query_args.hpp"
+#include "args.hpp"
 
 class ResultGetter : public CustomResponse {
    private:
@@ -119,7 +119,7 @@ std::tuple<int, int, int, int> compareVectors(const std::vector<int>& result, co
 
     assert(result.size() == truth.size());
 
-    for (int i = 0; i < result.size(); i++) {
+    for (std::size_t i = 0; i < result.size(); i++) {
         if (truth[i]) {
             if (result[i]) {
                 tp++;
@@ -164,7 +164,7 @@ void compareWithTruth(const std::string& indexFilename, const std::string& KMCFi
     std::cout << tp << " " << tn << " " << fp << " " << fn << std::endl;
     std::cout << "fpr = " << ((double)fp) / ((double)(fp + tn)) << std::endl;
 
-    const auto& [tpc, tnc, fpc, fnc] = compareVectors(index_response, truth_response);
+    const auto& [tpc, tnc, fpc, fnc] = compareVectors(construction_truth_response, truth_response);
     std::cout << tpc << " " << tnc << " " << fpc << " " << fnc << std::endl;
     std::cout << "fprc = " << ((double)fpc) / ((double)(fpc + tnc)) << std::endl;
 
@@ -175,8 +175,20 @@ void compareWithTruth(const std::string& indexFilename, const std::string& KMCFi
 }
 
 int main(int argc, char* argv[]) {
-    cxxopts::ParseResult arguments = parseArgvQuery(argc, argv);
-    const auto& [index_filename, query_filename, K, z] = getArgsQuery(arguments);
-    std::string KMCFilename = "/home/lrobidou/Documents/programmes/forge/fimperaBF/data/35merlists.txt";
-    compareWithTruth(index_filename, KMCFilename, query_filename, 1, 1);  //TODO copy data from index ?
+    argparse::ArgumentParser program("fimpera_index", "0.0.1");
+    // mandatory arguments
+    program.add_argument("input_filename").help("index you want to query");
+    program.add_argument("query_filename").help("file you want to query against the index");
+
+    parse(program, argc, argv);
+    // optional arguments
+    // TODO use value stored in filter
+    // program.add_argument("-K").help("size of Kmers").default_value(31).scan<'i', int>();
+    // program.add_argument("-z").help("value of z (cf paper of findere)").default_value(3).scan<'i', int>();
+
+    const std::string index_filename = program.get("input_filename");
+    const std::string query_filename = program.get("query_filename");
+
+    std::string KMCFilename = "ecoli35_canonical.txt";
+    compareWithTruth(index_filename, KMCFilename, query_filename, 1, 1);  // TODO copy data from index ?
 }
