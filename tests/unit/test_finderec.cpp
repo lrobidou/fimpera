@@ -202,7 +202,7 @@ inline std::vector<int> sliding_window_minimum_pierre(const std::vector<int>& AR
     std::vector<int> res;
     res.reserve(ARR.size() - K + 1);
     int min = ARR[0];
-    int i_min = 0;
+    std::size_t i_min = 0;
 
     for (int j = 1; j < K; j++) {
         if (ARR[j] < min) {
@@ -212,11 +212,11 @@ inline std::vector<int> sliding_window_minimum_pierre(const std::vector<int>& AR
     }
     res.push_back(min);
 
-    for (int i = K; i < ARR.size(); i++) {
+    for (std::size_t i = K; i < ARR.size(); i++) {
         if (i_min == i - K) {
             i_min = i - K + 1;
             min = ARR[i_min];
-            for (int j = i - K + 2; j < i; j++) {
+            for (std::size_t j = i - K + 2; j < i; j++) {
                 if (ARR[j] < min) {
                     i_min = j;
                     min = ARR[i_min];
@@ -235,9 +235,9 @@ inline std::vector<int> sliding_window_minimum_pierre(const std::vector<int>& AR
 inline std::vector<int> sliding_window_minimum_naive(const std::vector<int>& ARR, int K) {
     std::vector<int> res;
 
-    for (int j = 0; j < ARR.size() - K + 1; j++) {  // j : start of the window
+    for (std::size_t j = 0; j < ARR.size() - K + 1; j++) {  // j : start of the window
         int min = ARR[j];
-        for (int k = j; k < j + K; k++) {  // k : current position in the tab
+        for (std::size_t k = j; k < j + K; k++) {  // k : current position in the tab
             if (ARR[k] < min) {
                 min = ARR[k];
             }
@@ -309,6 +309,7 @@ inline std::vector<int> sliding_window_minimum_2(const std::vector<int>& ARR, in
     }
     return result;
 }
+
 TEST(fimpera_test_suite_finderec, test_sliding_window_minimum_naive) {
     int size = 300000;
     int window_size = 7;
@@ -323,28 +324,28 @@ TEST(fimpera_test_suite_finderec, test_sliding_window_minimum_naive) {
     using namespace std::chrono;
 
     // After function call
-    auto start = high_resolution_clock::now();
+    // auto start = high_resolution_clock::now();
     const std::vector<int> out0 = sliding_window_minimum_naive(in, window_size);
-    auto naive1 = high_resolution_clock::now();
+    // auto naive1 = high_resolution_clock::now();
     const std::vector<int> out1 = sliding_window_minimum_pierre(in, window_size);
-    auto naive2 = high_resolution_clock::now();
+    // auto naive2 = high_resolution_clock::now();
     const std::vector<int> out2 = sliding_window_minimum_1(in, window_size);
-    auto end_1 = high_resolution_clock::now();
+    // auto end_1 = high_resolution_clock::now();
     const std::vector<int> out3 = sliding_window_minimum_2(in, window_size);
-    auto end_2 = high_resolution_clock::now();
+    // auto end_2 = high_resolution_clock::now();
     const std::vector<int> out4 = sliding_window_minimum(in, window_size);
-    auto end_3 = high_resolution_clock::now();
+    // auto end_3 = high_resolution_clock::now();
 
-    auto duration_naive_1 = duration_cast<microseconds>(naive1 - start).count();
-    auto duration_naive_2 = duration_cast<microseconds>(naive2 - naive1).count();
-    auto duration_1 = duration_cast<microseconds>(end_1 - naive2).count();
-    auto duration_2 = duration_cast<microseconds>(end_2 - end_1).count();
-    auto duration_3 = duration_cast<microseconds>(end_3 - end_2).count();
-    std::cout << "naive:  " << duration_naive_1 << std::endl;
-    std::cout << "deque:  " << duration_1 << std::endl;
-    std::cout << "tab:    " << duration_2 << std::endl;
-    std::cout << "pierre: " << duration_naive_2 << std::endl;
-    std::cout << "dyn:    " << duration_3 << std::endl;
+    // auto duration_naive_1 = duration_cast<microseconds>(naive1 - start).count();
+    // auto duration_naive_2 = duration_cast<microseconds>(naive2 - naive1).count();
+    // auto duration_1 = duration_cast<microseconds>(end_1 - naive2).count();
+    // auto duration_2 = duration_cast<microseconds>(end_2 - end_1).count();
+    // auto duration_3 = duration_cast<microseconds>(end_3 - end_2).count();
+    // std::cout << "naive:  " << duration_naive_1 << std::endl;
+    // std::cout << "deque:  " << duration_1 << std::endl;
+    // std::cout << "tab:    " << duration_2 << std::endl;
+    // std::cout << "pierre: " << duration_naive_2 << std::endl;
+    // std::cout << "dyn:    " << duration_3 << std::endl;
 
     EXPECT_EQ(out0, out1);
     EXPECT_EQ(out0, out2);

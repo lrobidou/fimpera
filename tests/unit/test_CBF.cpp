@@ -16,39 +16,43 @@ inline std::string random_string(size_t length) {
     return str;
 }
 TEST(fimpera_test_suite_CBF, one_set) {
+    uint64_t occurrence = 1;
     countingBF::CBF cbf = countingBF::CBF(1000, 5);
-    cbf.set("123456789", 1);
-    EXPECT_EQ(cbf.get("123456789"), 1);
+    cbf.set("123456789", occurrence);
+    EXPECT_EQ(cbf.get("123456789"), occurrence);
 }
 
 TEST(fimpera_test_suite_CBF, multiple_set) {
+    uint64_t occurrence = 1;
     countingBF::CBF cbf = countingBF::CBF(1000, 5);
-    cbf.set("123456789", 1);
-    cbf.set("123456789", 1);
-    cbf.set("123456789", 1);
-    cbf.set("123456789", 1);
-    cbf.set("123456789", 1);
-    EXPECT_EQ(cbf.get("123456789"), 1);
+    cbf.set("123456789", occurrence);
+    cbf.set("123456789", occurrence);
+    cbf.set("123456789", occurrence);
+    cbf.set("123456789", occurrence);
+    cbf.set("123456789", occurrence);
+    EXPECT_EQ(cbf.get("123456789"), occurrence);
 }
 
 TEST(fimpera_test_suite_CBF, mutilple_set_check_max) {
     countingBF::CBF cbf = countingBF::CBF(1000, 5);
+    uint64_t expected = 8;
     cbf.set("123456789", 1);
     cbf.set("123456789", 2);
     cbf.set("123456789", 8);
     cbf.set("123456789", 3);
     cbf.set("123456789", 1);
-    EXPECT_EQ(cbf.get("123456789"), 8);
+    EXPECT_EQ(cbf.get("123456789"), expected);
 }
 
 TEST(fimpera_test_suite_CBF, mutilple_set_check_max_limit) {
     countingBF::CBF cbf = countingBF::CBF(1000, 5);
+    uint64_t maxLimit = 31;
     cbf.set("123456789", 1);
     cbf.set("123456789", 2);
     cbf.set("123456789", 8);
     cbf.set("123456789", 100);
     cbf.set("123456789", 1);
-    EXPECT_EQ(cbf.get("123456789"), 31);
+    EXPECT_EQ(cbf.get("123456789"), maxLimit);
 }
 
 TEST(fimpera_test_suite_CBF, fpr_1) {  //TODO write a function to get fpr (and test it)

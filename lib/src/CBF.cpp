@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <math.h>  // TODO remove ?
+#include <math.h>  // OPTIMIZE use << instead ?
 #include <xxhash64.h>
 
 #include <cstring>
@@ -16,11 +16,11 @@ uint64_t CBF::getIndex(const std::string& kmer) const {
     return index;
 }
 
-int CBF::get(const uint64_t& index) const {
-    int data = 0;
+uint64_t CBF::get(const uint64_t& index) const {
+    uint64_t data = 0;
     for (uint64_t i = 0; i < _nbBuckets; i++) {
         data <<= 1;
-        data += _bits[index * _nbBuckets + i];  // TODO gros con
+        data += _bits[index * _nbBuckets + i];
     }
     return data;
 }
@@ -47,11 +47,11 @@ CBF::CBF(std::ifstream& fin) {
     }
 }
 
-int CBF::set(const std::string& kmer, int occurrence) {
+uint64_t CBF::set(const std::string& kmer, uint64_t occurrence) {
     uint64_t index = getIndex(kmer);
 
     // get existing data
-    int data = get(index);
+    uint64_t data = get(index);
 
     // compute new value of data
     if (data < occurrence) {
@@ -75,7 +75,7 @@ int CBF::set(const std::string& kmer, int occurrence) {
     return data;
 }
 
-int CBF::get(const std::string& kmer) const {
+uint64_t CBF::get(const std::string& kmer) const {
     return get(getIndex(kmer));
 }
 

@@ -1,11 +1,13 @@
 #pragma once
+
+#include <fimpera-lib/canonical.hpp>
 #include <fimpera-lib/fimpera.hpp>
 #include <fimpera-lib/finderec.hpp>
 #include <fimpera-lib/generators/ReadReader.hpp>
-#include <zstr.hpp>  //TODO
+#include <zstr.hpp>
 
 template <typename T>
-fimpera<T>::fimpera(const std::string& filename, const unsigned int& K, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets) : _filter(nbBits, nbBuckets), _canonical(canonical), _k(K - z), _z(z) {
+fimpera<T>::fimpera(const std::string& filename, const int& K, const int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets) : _filter(nbBits, nbBuckets), _canonical(canonical), _k(K - z), _z(z) {
     assert(K >= z);
     if (!fileExists(filename)) {
         std::string msg = "The file " + filename + " does not exist.";
@@ -15,6 +17,7 @@ fimpera<T>::fimpera(const std::string& filename, const unsigned int& K, const un
     zstr::istream myFile(myFileGz);
 
     std::string line;
+    std::string kmer;
     while (std::getline(myFile, line)) {  // \n are removed
         std::string Kmer;
         std::string abundanceStr;
@@ -22,12 +25,15 @@ fimpera<T>::fimpera(const std::string& filename, const unsigned int& K, const un
         std::getline(linestream, Kmer, '\t');
         std::getline(linestream, abundanceStr, '\t');
 
-        assert(Kmer.length() == K);
+        // assert(Kmer.length() == K);//TODO check that the file actually contains Kmer
         unsigned long long size = Kmer.size();
         unsigned long long j = 0;  // start of the kmer in the Kmer
         while (j < size - _k + 1) {
-            // TODO handle canonical
-            _filter.set(Kmer.substr(j, _k), std::stoll(abundanceStr));
+            kmer = Kmer.substr(j, _k);
+            if (_canonical) {
+                kmer = toCanonical(kmer);
+            }
+            _filter.set(kmer, std::stoll(abundanceStr));
             j++;
         }
     }
@@ -36,7 +42,7 @@ fimpera<T>::fimpera(const std::string& filename, const unsigned int& K, const un
 template <typename T>
 fimpera<T>::fimpera(const std::string& filename) {
     std::ifstream fin(filename, std::ios::out | std::ofstream::binary);
-    std::string thisuuid = getFromFile<std::string>(fin);  //TODO check uuid
+    std::string thisuuid = getFromFile<std::string>(fin);  // TODO check uuid
     std::string desc = getFromFile<std::string>(fin);
     _k = getFromFile<unsigned int>(fin);
     _z = getFromFile<unsigned int>(fin);
@@ -61,7 +67,7 @@ void fimpera<T>::query(const std::string& filename, CustomResponse& response) co
 
 template <typename T>
 void fimpera<T>::save(const std::string& filename) const {
-    std::string jsonStr = "";  //TODO add infos of the data structure used to index
+    std::string jsonStr = "";  // TODO add infos of the data structure used to index
     // TODO make the T have a method to retrieve inner info and add them to the json
     // open the file
     std::ofstream fout(filename, std::ios::out | std::ofstream::binary);
@@ -81,12 +87,12 @@ bool fimpera<T>::getCanonical() const {
 }
 
 template <typename T>
-unsigned int fimpera<T>::getK() const {
+int fimpera<T>::getK() const {
     return this->_k + this->_z;
 }
 
 template <typename T>
-unsigned int fimpera<T>::getz() const {
+int fimpera<T>::getz() const {
     return this->_z;
 }
 

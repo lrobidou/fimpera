@@ -76,7 +76,7 @@ class FileManager {
         return tmp_read;
     }
 
-    const unsigned long get_reads_seen() const { return nb_seen_reads; };
+    unsigned long get_reads_seen() const { return nb_seen_reads; };
 
     // Add a file to the FileManager
     virtual void addFile(const std::string &file_name) {

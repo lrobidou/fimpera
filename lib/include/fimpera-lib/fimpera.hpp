@@ -17,15 +17,15 @@ class fimpera {
     const static std::string description;
 
    public:
-    fimpera(const std::string& filename, const unsigned int& K, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets = 1);
+    fimpera(const std::string& filename, const int& K, const int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets = 1);
     fimpera(const std::string& filename);
     void query(const std::string& filename, CustomResponse& response) const;
     void save(const std::string& filename) const;
 
     // getter
     bool getCanonical() const;
-    unsigned int getK() const;
-    unsigned int getz() const;
+    int getK() const;
+    int getz() const;
 
     // operator
     bool operator==(const fimpera<T>& that) const {
@@ -44,16 +44,16 @@ inline std::string readUUID(std::ifstream& fin) {
     return getFromFile<std::string>(fin);  //TODO check uuid
 }
 
-inline std::tuple<std::string, unsigned int, unsigned int, bool, std::string> getMetadatav0(std::ifstream& fin) {
+inline std::tuple<std::string, int, int, bool, std::string> getMetadatav0(std::ifstream& fin) {
     std::string description = getFromFile<std::string>(fin);
-    unsigned int k = getFromFile<unsigned int>(fin);
-    unsigned int z = getFromFile<unsigned int>(fin);
+    int k = getFromFile<int>(fin);
+    int z = getFromFile<int>(fin);
     bool canonical = getFromFile<bool>(fin);
     std::string jsonString = getFromFile<std::string>(fin);
     return {description, k, z, canonical, jsonString};
 }
 
-inline std::tuple<std::string, std::string, unsigned int, unsigned int, bool, std::string> getMetadata(std::ifstream& fin) {
+inline std::tuple<std::string, std::string, int, int, bool, std::string> getMetadata(std::ifstream& fin) {
     std::string uuid = readUUID(fin);
     if (uuid == fimpera_uuid0) {
         return std::tuple_cat(std::make_tuple(uuid), getMetadatav0(fin));

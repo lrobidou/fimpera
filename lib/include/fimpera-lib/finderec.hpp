@@ -1,7 +1,9 @@
 #pragma once
-#include <assert.h>  //TODO remove
+#include <assert.h>
 
+#include <algorithm>
 #include <deque>
+#include <fimpera-lib/canonical.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -19,7 +21,7 @@ inline T minElemInWindow(std::vector<T> vect, int iMin, int iMax) {
 }
 
 // inspired by http://www.zrzahid.com/sliding-window-minmax/
-inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, int w) {
+inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, uint64_t w) {
     std::vector<int> sliding_min = std::vector<int>(ARR.size() - w + 1);
 
     if (ARR.size() < w) {
@@ -35,20 +37,20 @@ inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, int 
     int min_left = ARR[0];
     std::vector<int> min_right = std::vector<int>(w);
 
-    int nbWin = ARR.size() / w;
+    uint64_t nbWin = ARR.size() / w;
 
-    for (int i = 0; i < w; i++) {
+    for (uint64_t i = 0; i < w; i++) {
         min_left = std::min(min_left, ARR[i]);
     }
 
-    for (int i = 0; i < nbWin - 1; i++) {
+    for (uint64_t i = 0; i < nbWin - 1; i++) {
         int start_window = i * w;
         min_right[w - 1] = ARR[start_window + w - 1];
         for (int indice = start_window + w - 2; indice >= start_window; indice--) {
             min_right[indice - start_window] = std::min(min_right[indice - start_window + 1], ARR[indice]);
         }
 
-        for (int j = 0; j < w; j++) {
+        for (uint64_t j = 0; j < w; j++) {
             sliding_min[start_window + j] = std::min(min_right[j], min_left);
             min_left = (j == 0) ? ARR[start_window + w + j] : std::min(min_left, ARR[start_window + w + j]);
         }
@@ -57,14 +59,14 @@ inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, int 
     // last window
     int we_go_up_to = ARR.size() % w + 1;
 
-    // compute last part of min_right
+    // compute min_right for last window
     int start_window = (nbWin - 1) * w;
     min_right[w - 1] = ARR[start_window + w - 1];
     for (int indice = start_window + w - 2; indice >= start_window; indice--) {
         min_right[indice - start_window] = std::min(min_right[indice - start_window + 1], ARR[indice]);
     }
 
-    //
+    // compute the min for tha last window
     for (int j = 0; j < we_go_up_to - 1; j++) {
         sliding_min[start_window + j] = std::min(min_right[j], min_left);
         min_left = (j == 0) ? ARR[start_window + w + j] : std::min(min_left, ARR[start_window + w + j]);
@@ -77,7 +79,9 @@ inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, int 
 
 template <typename T>
 inline int doQuery(const T& amqc, const std::string& kmer, bool canonical) {
-    // TODO canonical
+    if (canonical) {  // TODO test
+        return amqc.get(toCanonical(kmer));
+    }
     return amqc.get(kmer);
 }
 
@@ -109,7 +113,7 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
     previous_answers.reserve(response.size());
     while (j < size - k + 1) {
         assert(stretchLength == previous_answers.size());
-        if (thisAnswer = doQuery(amqc, query.substr(j, k), canonical)) {
+        if ((thisAnswer = doQuery(amqc, query.substr(j, k), canonical))) {
             if (extending_stretch) {
                 previous_answers.push_back(thisAnswer);
                 stretchLength++;
