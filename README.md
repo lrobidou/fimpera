@@ -1,140 +1,106 @@
-# fimpera
+# fimpera <!-- omit in toc -->
 
 [![cpp-app](https://github.com/lrobidou/fimpera/actions/workflows/ci.yml/badge.svg)](https://github.com/lrobidou/fimpera/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/lrobidou/fimpera/branch/master/graph/badge.svg?token=CXO15KTTYE)](https://codecov.io/gh/lrobidou/fimpera)
 
-TODO
+[![License](http://img.shields.io/:license-affero-blue.svg)](http://www.gnu.org/licenses/agpl-3.0.en.html)
 
-## Features
 
-### CMake build
+`fimpera` is a simple strategy for speeding up queries and for reducing false positive calls from any Approximate Membership Query data structure (AMQ) that supports abundance queries. <!-- With no drawbacks (in particular no false positive), queries are two times faster with two orders of magnitudes less false positive calls. (TODO: check this statement) --> 
+
+<!-- TODO image -->
+
+The `fimpera` implementation proposed here uses a counting Bloom filter. It proposes a way to index and query Kmers from biological sequences (fastq or fasta, gzipped or not). <!-- , possibly considering only canonical Kmers). (TODO: code and check)--> <!-- or from any textual data (TODO code and check) -->
+
+`fimpera` relies on templates, hence it can be easily adapted to any other AMQ that supports abundance queries, for any usage.
+
+# Table of content <!-- omit in toc -->
+
+- [Install](#install)
+  - [Dependencies](#dependencies)
+  - [Install `fimpera`](#install-fimpera)
+- [Running](#running)
+  - [Overview](#overview)
+- [Contacts](#contacts)
+- [Work in progress](#work-in-progress)
+
+# Install 
+## Dependencies
+
+You must first install zlib. It is likely to be already installed, if not you can try:
+```bash
+sudo apt update
+sudo apt-cache search zlib  # zlib1g-dev on Ubuntu 20.04.
+sudo apt-get install zlib  # or wathever you found with apt-cache search
+```
+
+
+## Install `fimpera`
 
 ```bash
-mkdir build && cd build && cmake .. && make
+git clone --recursive https://github.com/lrobidou/fimpera
+cd fimpera
+./install.sh
 ```
 
-* Application binary: `build/app/*`
-* Lib : `build/lib/*`
-* Configuration header : `build/include/*`
-
-#### Tests
-
+<!-- ## Reproduce paper results -->
+<!-- TODO -->
+# Running
+**note:**  
+`fimpera` needs a file containing the abundance of each Kmers to index them (each line should contain a Kmer (not a kmer), one tab and the abundance associated with that Kmer). KMC can provide such file, however you are free to use another kmer counter program.
+## Overview
 
 ```bash
-cmake .. -DWITH_TESTS=ON && make
+# indexing a file
+./bin/fimpera_index <KMCfile (.txt)> <index_name> [ -b <number of bits per buckets in the filter> -K <K> -z <z> --canonical ]
+
+# querying a file
+./bin/fimpera_query <index_name> <your query file>
 ```
-Produces an unique executable for all test suites `tests/unit/test_*.cpp` and add two targets: `test` and `test_memcheck`.
+<!-- TODO [ <threshold> ] -->
 
-```bash
-make test && make test_memcheck
-```
+<!-- ## Example on natural text file
+TODO -->
 
-#### Coverage
-
-Requirements:
-* gcov
-* lcov
-* genhtml
-
-```bash
-cmake .. -DCMAKE_BUILD_TYPE=Coverage -DWITH_TESTS=ON -DWITH_COVERAGE=ON && make && make coverage-report
-```
-Produces an html report at `<build_dir>/coverage-reports`.
-
-#### Profiling
-
-Requirements:
-* valgrind
-* valgrind development files
-
-```bash
-cmake .. -DCMAKE_BUILD_TYPE=Profile -DWITH_PROFILE=ON && make
-```
-Produces a profilable executable for each `tests/profiles/profile_*.cpp` at `<build_dir>/profile_bin` and adds the corresponding targets `profile-profile_*`.
-
-```bash
-make profile-profile_ex
-```
-Produces `profile-profile_ex.log` and `profile-profile_ex.out` at `<build_dir>/profiles`.
-
-#### CppCheck
-
-Requirements:
-* cppcheck
-* cppcheck-htmlreport
-
-```bash
-cmake .. -DWITH_CPPCHECK=ON && make && make cppcheck-report
-```
-Produces an html report at `<build_dir>/cppcheck-report`.
-#### Doxygen
-
-Requirements:
-* doxygen
-
-Configuration: `Doxyfile`
-
-```bash
-cmake .. -DWITH_DOC=ON && make && make documentation
-```
-Produces html documentation at `<build_dir>/documentation`.
-
-#### ClangFormat
-
-Requirements:
-* clang-format
-
-Configuration: `.clang-format`
-
-```bash
-cmake .. -DWITH_CLANGFORMAT=ON
-make format-lib # format file at libs/
-make format-app # format file at app/
-```
-
-#### Packaging
-
-Configuration: `cmake/CPackConfig.cmake`
-
-```bash
-cmake .. && make && make package
-```
-Produces an archive `<build_dir>/<app_name>-vX.Y.Z-bin-<system>.tar.gz` with:
-* `bin/<app_name>`
-* `lib/<lib_name>.a|so>`
-* `include/<lib_name>/*.hpp`
-
-### Github Action CI
-
-#### Matrix build
-
-* os: Ubuntu-20.04, MacOS 10.15
-* compiler (Linux only): gcc8, gcc9, gcc10
-
-#### Code coverage
-
-* Automatic report on [CodeCov](https://app.codecov.io/gh/lrobidou/fimpera/).
-* Requires to add `CODECOV_TOKEN` in repository's secrets.
-
-#### Automatic release
-
-1. Create a changelog file
+<!-- ## Usage on genomic data (fastq or fasta file)
+TODO -->
 
 
-```
-> cat docs/changelogs/vX.Y.Z.md
-### cpp-app-template vX.Y.Z
-* Auto release example
-```
+<!-- # Using fimpera with a personal Approximate Membership Query data structure -->
 
-2. Add a new tag
+<!-- TODO -->
 
-```
-git tag vX.Y.Z
-git push origin vX.Y.Z
-```
+# Contacts
 
-A new release is then created by Github Actions with the content of `docs/changelogs/vX.Y.Z.md` and the following assets:
-  * `<name>-vX.Y.Z-bin-Linux.tar.gz` (compiled binary for Linux)
-  * `<name>-vX.Y.Z-bin-Darwin.tar.gz` (compiled binary for MacOS)
-  * `<name>-vX.Y.Z-sources.tar.gz` (sources including submodules)
+Lucas Robidou: lucas.robidou@inria.fr
+
+Pierre Peterlongo: pierre.peterlongo@inria.fr
+
+<!-- # Citation -->
+
+<!-- TODO -->
+
+
+
+
+
+<!-- ## Reproduce paper results -->
+<!-- TODO -->
+
+
+# Work in progress
+
+`fimpera itself`
+- [ ] use uuid to decide whether the index is actually a `fimpera` index
+- [ ] read lowercase letters as uppercase letters when indexing genomic data
+- [ ] handle 'n' in canonical queries
+- [ ] verify that the index exists before trying to query it
+- [ ] remove assert in code, replace with exception where needed
+- [ ] optimize canonical function
+
+
+`documentation`
+- [ ] (re)write documentation for every function
+- [ ] write at least a README.md that explains the way the code is organized
+
+
