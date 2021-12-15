@@ -179,6 +179,7 @@ int main(int argc, char* argv[]) {
     // mandatory arguments
     program.add_argument("input_filename").help("index you want to query");
     program.add_argument("query_filename").help("file you want to query against the index");
+    program.add_argument("kmc_filename").help("kmc file that contains the truth for the Kmers");
 
     parse(program, argc, argv);
     // optional arguments
@@ -188,7 +189,7 @@ int main(int argc, char* argv[]) {
 
     const std::string index_filename = program.get("input_filename");
     const std::string query_filename = program.get("query_filename");
+    const std::string kmc_filename = program.get("kmc_filename");
 
-    std::string KMCFilename = "ecoli35_canonical.txt";
-    compareWithTruth(index_filename, KMCFilename, query_filename, 1, 1);  // TODO copy data from index ?
+    compareWithTruth(index_filename, kmc_filename, query_filename, 1, 1);  // TODO copy data from index ?
 }
