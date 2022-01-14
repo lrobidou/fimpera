@@ -24,3 +24,11 @@ target_link_libraries(fimpera_query ${LIBRARY_NAME} ${APP_LINK} z)
 add_executable(fimpera_truth ${APP_SOURCE_DIR}/truth.cpp)
 add_dependencies(fimpera_truth ${APP_DEPENDENCIES})
 target_link_libraries(fimpera_truth ${LIBRARY_NAME} ${APP_LINK} z)
+
+add_executable(fimpera_shell ${APP_SOURCE_DIR}/shell.cpp)
+add_dependencies(fimpera_shell ${APP_DEPENDENCIES})
+target_link_libraries(fimpera_shell ${LIBRARY_NAME} ${APP_LINK} z)
+
+add_executable(fimpera_ctruth ${APP_SOURCE_DIR}/ctruth.cpp)
+add_dependencies(fimpera_ctruth ${APP_DEPENDENCIES})
+target_link_libraries(fimpera_ctruth ${LIBRARY_NAME} ${APP_LINK} z)

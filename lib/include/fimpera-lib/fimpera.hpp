@@ -20,6 +20,7 @@ class fimpera {
     fimpera(const std::string& filename, const int& K, const int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets = 1);
     fimpera(const std::string& filename);
     void query(const std::string& filename, CustomResponse& response) const;
+    void query_read(const std::string& read, CustomResponse& response) const;  // TODO remove ?
     void save(const std::string& filename) const;
 
     // getter
@@ -41,7 +42,7 @@ template <typename T>
 const std::string fimpera<T>::description = "fimpera index version 0. https://github.com/lrobidou/fimpera";
 
 inline std::string readUUID(std::ifstream& fin) {
-    return getFromFile<std::string>(fin);  //TODO check uuid
+    return getFromFile<std::string>(fin);  // TODO check uuid
 }
 
 inline std::tuple<std::string, int, int, bool, std::string> getMetadatav0(std::ifstream& fin) {

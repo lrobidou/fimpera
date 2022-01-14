@@ -25,10 +25,10 @@ fimpera<T>::fimpera(const std::string& filename, const int& K, const int& z, boo
         std::getline(linestream, Kmer, '\t');
         std::getline(linestream, abundanceStr, '\t');
 
-        // assert(Kmer.length() == K);//TODO check that the file actually contains Kmer
+        // assert(Kmer.length() == K);//TODO check that the file actually contains kmer (or smer)
         unsigned long long size = Kmer.size();
         unsigned long long j = 0;  // start of the kmer in the Kmer
-        while (j < size - _k + 1) {
+        while (j + _k < size + 1) {
             kmer = Kmer.substr(j, _k);
             if (_canonical) {
                 kmer = toCanonical(kmer);
@@ -63,6 +63,12 @@ void fimpera<T>::query(const std::string& filename, CustomResponse& response) co
         std::vector<int> res = finderec(_filter, current_read, _k + _z, _z, _canonical);
         response.processResult(res, _k + _z, current_header, current_read);
     }
+}
+
+template <typename T>
+void fimpera<T>::query_read(const std::string& read, CustomResponse& response) const {
+    std::vector<int> res = finderec(_filter, read, _k + _z, _z, _canonical);
+    response.processResult(res, _k + _z, "null", read);
 }
 
 template <typename T>
