@@ -1,23 +1,11 @@
+#include <robin_hood.h>
+
 #include <fimpera-lib/CBF.hpp>
 #include <fimpera-lib/fimpera.hpp>
+#include <memory>
+#include <string>
 
 #include "args.hpp"
-
-class ResultGetter : public CustomResponse {
-   private:
-    std::vector<int> entireResponse;
-
-   public:
-    ResultGetter() {}
-
-    void processResult(const std::vector<int>& res, const unsigned int& K, const std::string& current_header, const std::string& current_read) {
-        entireResponse.insert(std::end(entireResponse), std::begin(res), std::end(res));
-    }
-
-    std::vector<int> getResult() {
-        return entireResponse;
-    }
-};
 
 namespace shell {
 
@@ -36,28 +24,78 @@ inline std::string input() {
     }
     return cmd;
 }
+
+class Memory;
+using shell_method_t = void (Memory::*)(const std::string&);
+
+class Memory {
+   private:
+    robin_hood::unordered_map<std::string, shell_method_t> _mapping{};
+    robin_hood::unordered_map<std::string, std::unique_ptr<fimpera<countingBF::CBF>>> _filters{};
+
+    void load(const std::string& cmd);
+
+    void do_query(const std::string& filename, const std::unique_ptr<fimpera<countingBF::CBF>>& filter, const std::string& read) {
+        std::cout << "quering " << filename << std::endl;
+
+        std::string to_print = "";
+
+        std::vector<int> response = filter->queryRead(read);
+        for (const auto& x : response) {
+            if (!to_print.empty()) {
+                to_print += " ";
+            }
+            to_print += std::to_string(x);
+        }
+        std::cout << to_print << std::endl;
+    }
+
+   public:
+    Memory();
+    void call(const std::string& cmd);
+    ~Memory();
+};
+
+Memory::Memory() {
+    _mapping["load"] = &Memory::load;
+}
+
+void Memory::call(const std::string& cmd) {
+    const std::string fct_name = cmd.substr(0, cmd.find(" "));
+    robin_hood::unordered_map<std::string, shell_method_t>::iterator fct_iter = this->_mapping.find(fct_name);
+    if (fct_iter != this->_mapping.end()) {
+        (this->*(fct_iter->second))(cmd);
+    } else {
+        for (auto const& [key, val] : this->_filters) {
+            this->do_query(key, val, cmd);
+        }
+    }
+}
+
+Memory::~Memory() {
+}
+
+void Memory::load(const std::string& cmd) {
+    std::size_t first_space = cmd.find(" ");
+    // TODO check if space exists
+    const std::string& filename = cmd.substr(first_space + 1, cmd.length() - first_space - 1);
+    std::cout << "loading " << filename << "..." << std::flush;
+    // TODO test ecrase t on des données ?
+    this->_filters[filename] = std::make_unique<fimpera<countingBF::CBF>>(filename);
+    std::cout << " done." << std::endl;
+}
+
 }  // namespace shell
 
 int main(int argc, char* argv[]) {
-    argparse::ArgumentParser program("fimpera_index", "0.0.1");
-    // mandatory arguments
-    program.add_argument("input_filename").help("index you want to query");
-
+    argparse::ArgumentParser program("fimpera_shell", "0.0.1");
     parse(program, argc, argv);
 
-    const std::string index_filename = program.get("input_filename");
-    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(index_filename);
-
+    shell::Memory memory;
     std::string cmd;
     try {
         while ((cmd = shell::input()) != "exit") {
-            ResultGetter result_getter = ResultGetter();
-            f.query_read(cmd, result_getter);
-            std::vector<int> response = result_getter.getResult();
-            for (const auto& x : response) {
-                std::cout << x;
-            }
-            std::cout << std::endl;
+            memory.call(cmd);
         }
     } catch (const shell::eof& e) {
         return 0;
