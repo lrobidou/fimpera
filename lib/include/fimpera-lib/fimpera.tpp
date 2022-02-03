@@ -53,22 +53,15 @@ fimpera<T>::fimpera(const std::string& filename) {
 
 template <typename T>
 void fimpera<T>::query(const std::string& filename, CustomResponse& response) const {
-    FileManager reader = FileManager();
-    reader.addFile(filename);
-    std::string current_read;
-
-    while (!(current_read = reader.get_next_read()).empty()) {
-        std::string current_data = reader.get_data();
-        std::string current_header = current_data.substr(0, current_data.find('\n'));
-        std::vector<int> res = finderec(_filter, current_read, _k + _z, _z, _canonical);
-        response.processResult(res, _k + _z, current_header, current_read);
+    for (const auto& [read, header] : fimpera_lib::generators::ReadReader(filename)) {
+        std::vector<int> res = finderec(_filter, read, _k + _z, _z, _canonical);
+        response.processResult(res, _k + _z, header, read);
     }
 }
 
 template <typename T>
-void fimpera<T>::query_read(const std::string& read, CustomResponse& response) const {
-    std::vector<int> res = finderec(_filter, read, _k + _z, _z, _canonical);
-    response.processResult(res, _k + _z, "null", read);
+std::vector<int> fimpera<T>::queryRead(const std::string& read) const {
+    return finderec(_filter, read, _k + _z, _z, _canonical);
 }
 
 template <typename T>
