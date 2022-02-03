@@ -25,14 +25,11 @@ class ResultGetter : public CustomResponse {
     processResult(const std::vector<int>& res, const unsigned int& K, const std::string& current_header, const std::string& current_read) {
         entireResponse.push_back(res);
         std::vector<std::string> kmers;
-        int j = 0;
-        unsigned long long size = current_read.size();
+        std::size_t j = 0;
+        std::size_t size = current_read.size();
 
-        // printv(res);
         while (j < size - K + 1) {
-            // std::cout << j << std::endl;
             kmers.push_back(current_read.substr(j, K));
-
             j++;
         }
         if (kmers.size() != res.size()) {
@@ -195,16 +192,11 @@ int main(int argc, char* argv[]) {
     program.add_argument("z").help("value of z").scan<'i', int>();
 
     parse(program, argc, argv);
-    // optional arguments
-    // TODO use value stored in filter
-    // program.add_argument("K").help("size of Kmers").scan<'i', int>();
-    // program.add_argument("-z").help("value of z (cf paper of findere)").default_value(3).scan<'i', int>();
 
-    // const std::string index_filename = program.get("input_filename");
     const std::string query_filename = program.get("query_filename");
     const std::string kmc_filename = program.get("kmc_filename");
     const int K = program.get<int>("K");
     const int z = program.get<int>("z");
 
-    compareWithTruth(kmc_filename, query_filename, K, z);  // TODO copy data from index ?
+    compareWithTruth(kmc_filename, query_filename, K, z);
 }
