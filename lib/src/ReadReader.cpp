@@ -4,8 +4,8 @@ fimpera_lib::generators::read::Iterator::Iterator(FileManager& read_files) : _re
     next();
 }
 
-const std::string& fimpera_lib::generators::read::Iterator::operator*() const {
-    return _current_read;
+const std::tuple<const std::string&, const std::string&> fimpera_lib::generators::read::Iterator::operator*() const {
+    return {_current_read, _current_header};
 }
 
 fimpera_lib::generators::read::Iterator& fimpera_lib::generators::read::Iterator::operator++() {
@@ -19,6 +19,10 @@ bool fimpera_lib::generators::read::Iterator::operator!=(End_iterator) const {
 
 void fimpera_lib::generators::read::Iterator::next() {
     _current_read = _read_files.get_next_read();
+    if (!_current_read.empty()) {
+        std::string current_data = _read_files.get_data();
+        _current_header = current_data.substr(0, current_data.find('\n'));
+    }
 }
 
 fimpera_lib::generators::ReadReader::ReadReader(const std::string& filename) {
