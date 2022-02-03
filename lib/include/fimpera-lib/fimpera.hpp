@@ -20,7 +20,7 @@ class fimpera {
     fimpera(const std::string& filename, const int& K, const int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets = 1);
     fimpera(const std::string& filename);
     void query(const std::string& filename, CustomResponse& response) const;
-    void query_read(const std::string& read, CustomResponse& response) const;  // TODO remove ?
+    std::vector<int> queryRead(const std::string& read) const;
     void save(const std::string& filename) const;
 
     // getter
