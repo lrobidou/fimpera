@@ -8,7 +8,7 @@
 
 template <typename T>
 class fimpera {
-   private:
+   public:
     T _filter;
     bool _canonical;
     unsigned int _k;

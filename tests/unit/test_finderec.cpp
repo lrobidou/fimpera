@@ -42,23 +42,23 @@ TEST(fimpera_test_suite_finderec, minElemInWindow) {
     EXPECT_EQ(minElemInWindow(v, 0, 12), 0);
 }
 
-TEST(fimpera_test_suite_finderec, range_error) {
-    int K = 31;
-    int z = 0;
-    std::string query = "ACT";
-    std::vector<int> expected = {};
-    countingBF::CBF cbf = countingBF::CBF(1000, 5);
-    std::string expected_error = "`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ")";
-
-    try {
-        std::vector<int> res = finderec(cbf, query, K, z, false);
-        FAIL() << "Expected std::range_error";
-    } catch (std::range_error const& err) {
-        EXPECT_EQ(err.what(), expected_error);
-    } catch (...) {
-        FAIL() << "Expected std::range_error";
-    }
-}
+//TEST(fimpera_test_suite_finderec, range_error) {
+//    int K = 31;
+//    int z = 0;
+//    std::string query = "ACT";
+//    std::vector<int> expected = {};
+//    countingBF::CBF cbf = countingBF::CBF(1000, 5);
+//    std::string expected_error = "`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ")";
+//
+//    try {
+//        std::vector<int> res = finderec(cbf, query, K, z, false);
+//        FAIL() << "Expected std::range_error";
+//    } catch (std::range_error const& err) {
+//        EXPECT_EQ(err.what(), expected_error);
+//    } catch (...) {
+//        FAIL() << "Expected std::range_error";
+//    }
+//}
 
 TEST(fimpera_test_suite_finderec, negative_stretch_size1) {
     int K = 31;

@@ -98,9 +98,11 @@ inline int doQuery(const T& amqc, const std::string& kmer, bool canonical) {
  */
 template <typename T>
 inline std::vector<int> finderec(const T& amqc, const std::string& query, const unsigned int& K, const unsigned int& z, const bool& canonical) {
-    if (query.length() < K) {
-        throw std::range_error("`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ")");
-    }
+//    if (query.length() < K) {
+//        //throw std::range_error("`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ")");
+//	std::cerr << "`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ") : " << query << std::endl;
+//return std::vector<int>();
+//    }
 
     const unsigned int k = K - z;
     unsigned long long size = query.size();

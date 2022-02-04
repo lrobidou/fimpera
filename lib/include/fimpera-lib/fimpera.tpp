@@ -13,6 +13,7 @@ fimpera<T>::fimpera(const std::string& filename, const int& K, const int& z, boo
         std::string msg = "The file " + filename + " does not exist.";
         throw std::runtime_error(msg);
     }
+    std::cout << "in fimpera constructor " << nbBits << std::endl;
     std::ifstream myFileGz(filename);
     zstr::istream myFile(myFileGz);
 
@@ -28,13 +29,19 @@ fimpera<T>::fimpera(const std::string& filename, const int& K, const int& z, boo
         // assert(Kmer.length() == K);//TODO check that the file actually contains kmer (or smer)
         unsigned long long size = Kmer.size();
         unsigned long long j = 0;  // start of the kmer in the Kmer
-        while (j + _k < size + 1) {
-            kmer = Kmer.substr(j, _k);
-            if (_canonical) {
-                kmer = toCanonical(kmer);
+
+        try {
+            uint64_t abundance = std::stoll(abundanceStr);
+            while (j + _k < size + 1) {
+                kmer = Kmer.substr(j, _k);
+                if (_canonical) {
+                    kmer = toCanonical(kmer);
+                }
+                _filter.set(kmer, abundance);
+                j++;
             }
-            _filter.set(kmer, std::stoll(abundanceStr));
-            j++;
+        } catch(const std::invalid_argument& e){
+            std::cerr << "Invalid argument when parsing line :\"" << line << "\"" << std::endl;
         }
     }
 }

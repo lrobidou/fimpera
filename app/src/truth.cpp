@@ -178,16 +178,19 @@ void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAn
     FileManager reader = FileManager();
     reader.addFile(filename);
     std::string current_read;
-    int tp = 0;
-    int tn = 0;
-    int fp = 0;
-    int fn = 0;
+
+    uint64_t tp = 0;
+    uint64_t tn = 0;
+    uint64_t fp = 0;
+    uint64_t fn = 0;
 
     while (!(current_read = reader.get_next_read()).empty()) {
         std::string current_data = reader.get_data();
         std::string current_header = current_data.substr(0, current_data.find('\n'));
+
         std::vector<int> res = index.queryRead(current_read);
         std::vector<int> res_truth = truth.queryRead(current_read);
+
         const auto& [tpp, tnp, fpp, fnp] = compareVectors(res, res_truth);
         tp += tpp;
         tn += tnp;
@@ -249,12 +252,14 @@ int main(int argc, char* argv[]) {
     program.add_argument("input_filename").help("index you want to query");
     program.add_argument("query_filename").help("file you want to query against the index");
     program.add_argument("kmc_filename").help("kmc file that contains the truth for the Kmers");
-    program.add_argument("K").help("kmc file that contains the truth for the Kmers");
+    program.add_argument("K").help("size of Kmers").scan<'i', int>();
+    //program.add_argument("K").help("kmc file that contains the truth for the Kmers");
+
 
     parse(program, argc, argv);
     // optional arguments
     // TODO use value stored in filter
-    program.add_argument("K").help("size of Kmers").scan<'i', int>();
+    //program.add_argument("K").help("size of Kmers").scan<'i', int>();
     // program.add_argument("-z").help("value of z (cf paper of findere)").default_value(3).scan<'i', int>();
 
     const std::string index_filename = program.get("input_filename");
