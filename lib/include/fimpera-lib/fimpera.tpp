@@ -13,7 +13,7 @@ fimpera<T>::fimpera(const std::string& filename, const int& K, const int& z, boo
         std::string msg = "The file " + filename + " does not exist.";
         throw std::runtime_error(msg);
     }
-    std::cout << "in fimpera constructor " << nbBits << std::endl;
+    // std::cout << "in fimpera constructor " << nbBits << std::endl; // TODO: remove
     std::ifstream myFileGz(filename);
     zstr::istream myFile(myFileGz);
 
@@ -40,7 +40,7 @@ fimpera<T>::fimpera(const std::string& filename, const int& K, const int& z, boo
                 _filter.set(kmer, abundance);
                 j++;
             }
-        } catch(const std::invalid_argument& e){
+        } catch (const std::invalid_argument& e) {
             std::cerr << "Invalid argument when parsing line :\"" << line << "\"" << std::endl;
         }
     }
@@ -48,6 +48,11 @@ fimpera<T>::fimpera(const std::string& filename, const int& K, const int& z, boo
 
 template <typename T>
 fimpera<T>::fimpera(const std::string& filename) {
+    // std::cout << "loading fimpera from filename: " << filename << std::endl;//TODO log
+    if (!fileExists(filename)) {
+        std::string msg = "The file " + filename + " does not exist.";
+        throw std::runtime_error(msg);
+    }
     std::ifstream fin(filename, std::ios::out | std::ofstream::binary);
     std::string thisuuid = getFromFile<std::string>(fin);  // TODO check uuid
     std::string desc = getFromFile<std::string>(fin);
@@ -60,6 +65,10 @@ fimpera<T>::fimpera(const std::string& filename) {
 
 template <typename T>
 void fimpera<T>::query(const std::string& filename, CustomResponse& response) const {
+    if (!fileExists(filename)) {
+        std::string msg = "The file " + filename + " does not exist.";
+        throw std::runtime_error(msg);
+    }
     for (const auto& [read, header] : fimpera_lib::generators::ReadReader(filename)) {
         std::vector<int> res = finderec(_filter, read, _k + _z, _z, _canonical);
         response.processResult(res, _k + _z, header, read);
