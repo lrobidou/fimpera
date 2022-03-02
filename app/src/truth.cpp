@@ -171,27 +171,6 @@ auto since(std::chrono::time_point<clock_t, duration_t> const& start) {
     return std::chrono::duration_cast<result_t>(clock_t::now() - start);
 }
 
-// inline std::tuple<std::size_t, std::size_t, std::size_t, std::size_t> queryLowMemory(fimpera<TruthInTheShapeOfAnAMQ>& truth, fimpera<countingBF::CBF>& index, const std::string& filename) {
-//     FileManager reader = FileManager();
-//     std::size_t tp = 0;
-//     std::size_t tn = 0;
-//     std::size_t fp = 0;
-//     std::size_t fn = 0;
-
-//     for (const auto& [read, header] : fimpera_lib::generators::ReadReader(filename)) {
-//         std::vector<int> res = index.queryRead(read);
-//         std::vector<int> res_truth = truth.queryRead(read);
-//         const auto& [tpp, tnp, fpp, fnp] = compareVectors(res, res_truth);
-
-//         tp += tpp;
-//         tn += tnp;
-//         fp += fpp;
-//         fn += fnp;
-//     }
-
-//     return {tp, tn, fp, fn};
-// }
-
 using stats_t = std::tuple<std::size_t, std::size_t, std::size_t, std::size_t>;
 using index_and_truth = std::tuple<const fimpera<countingBF::CBF>&, const fimpera<TruthInTheShapeOfAnAMQ>&>;
 
@@ -217,23 +196,14 @@ std::tuple<T...> operator+(std::tuple<T...> lhs, const std::tuple<T...>& rhs) {
 
 inline std::vector<std::tuple<stats_t, stats_t>> queryLowMemory(const fimpera<TruthInTheShapeOfAnAMQ>& truth, const std::vector<index_and_truth>& indexes_and_ctruths, const std::string& filename) {
     FileManager reader = FileManager();
-
-    // std::size_t tp = 0;
-    // std::size_t tn = 0;
-    // std::size_t fp = 0;
-    // std::size_t fn = 0;
-    // std::valarray<std::size_t>{0, 0, 0, 0};
     std::vector<std::tuple<stats_t, stats_t>> stats_truth;
-    // std::vector<stats> stats_ctruth;
 
     std::size_t size = indexes_and_ctruths.size();
 
     stats_truth.reserve(size);
-    // stats_ctruth.reserve(size);
 
     for (size_t i = 0; i < size; i++) {
         stats_truth.push_back({{0, 0, 0, 0}, {0, 0, 0, 0}});
-        // stats_ctruth.push_back({0, 0, 0, 0});
     }
 
     for (const auto& [read, header] : fimpera_lib::generators::ReadReader(filename)) {
@@ -250,70 +220,6 @@ inline std::vector<std::tuple<stats_t, stats_t>> queryLowMemory(const fimpera<Tr
     return stats_truth;
 }
 
-// using iso_b_t = fimpera<countingBF::CBF>;
-// using iso_size_t = std::tuple<std::size_t, iso_b_t>;                                             // b, iso_b
-// using iso_z_t = std::tuple<std::size_t, std::vector<iso_size_t>>;                                // size, iso_size
-// using iso_k_t = std::tuple<std::size_t, fimpera<TruthInTheShapeOfAnAMQ>, std::vector<iso_z_t>>;  // z, ctruth, iso_z
-// using input_t = std::vector<std::tuple<std::size_t, fimpera<TruthInTheShapeOfAnAMQ>, std::vector<iso_k_t>>>;
-
-// void f(const input_t& input) {
-//     // assumes all vector of input have the same size, ie: "parallélotope droit" in french
-//     for (const auto& [k, truth_index, iso_k_vector] : input) {
-//         for (const auto& [z, ctruth_index, iso_z_vector] : iso_k_vector) {
-//             for (const auto& [size, iso_size_vector] : iso_z_vector) {
-//                 for (const auto& [b, filter] : iso_size_vector) {
-//                     // for (const auto& filter : iso_b_vector) {
-//                     //     //
-//                     // }
-//                 }
-//             }
-//         }
-//     }
-// }
-
-// input_t getMatrix(const std::string& indexBaseFilename,
-//                   const std::string& KMCFilename,
-//                   const std::string& queryFile,
-//                   const std::vector<std::size_t>& ks,
-//                   const std::vector<std::size_t>& zs,
-//                   const std::vector<std::size_t>& sizes,
-//                   const std::vector<std::size_t>& bs) {
-//     std::vector<std::tuple<std::size_t, fimpera<TruthInTheShapeOfAnAMQ>, std::vector<iso_k_t>>> input;
-//     for (const auto& k : ks) {
-//         std::tuple<std::size_t, fimpera<TruthInTheShapeOfAnAMQ>, std::vector<iso_k_t>> tuple = std::make_tuple(k, );
-//         std::vector<iso_k_t> vector;
-//         for (const auto& z : zs) {
-//             std::string ctruthFileName = "";
-//             iso_k_t iso_k = std::make_tuple(z, fimpera<TruthInTheShapeOfAnAMQ>(ctruthFileName), std::vector<iso_z_t>());
-//             for (const auto& size : sizes) {
-//                 iso_z_t iso_z = std::make_tuple(size, std::vector<iso_size_t>());
-//                 for (const auto b : bs) {
-//                     std::string indexFileName = "a";  // TODO remplir et deplacer ?
-//                     std::get<1>(iso_z).push_back(std::make_tuple(b, fimpera<countingBF::CBF>(indexFileName)));
-//                 }
-//                 // iso_z ready
-//                 std::get<2>(iso_k).push_back(iso_z);
-//             }
-//             // iso_k ready
-//             vector.push_back(iso_k);
-//         }
-//         // vector ready
-//         input.push_back(std::make_tuple(k, fimpera<TruthInTheShapeOfAnAMQ>("TODO"), vector));
-//     }
-//     return input;
-
-//     // for (const auto& [k, truth_index, iso_k_vector] : input) {
-//     //     for (const auto& [z, ctruth_index, iso_z_vector] : iso_k_vector) {
-//     //         for (const auto& [size, iso_size_vector] : iso_z_vector) {
-//     //             for (const auto& [b, filter] : iso_size_vector) {
-//     //                 // for (const auto& filter : iso_b_vector) {
-//     //                 //     //
-//     //                 // }
-//     //             }
-//     //         }
-//     //     }
-//     // }
-// }
 using output_iso_b_t = std::tuple<std::size_t, stats_t>;                                  // b, iso_b
 using output_iso_size_t = std::tuple<std::size_t, std::vector<output_iso_b_t>>;           // size, iso_size
 using output_iso_z_t = std::tuple<std::size_t, stats_t, std::vector<output_iso_size_t>>;  // z, ctruth, iso_z
@@ -382,14 +288,10 @@ output_t queryMatrix(const std::string& indexBaseFilename,
 
     // output initialised
 
-    // using output_iso_b_t = std::tuple<std::size_t, stats_t>;                                  // b, iso_b
-    // using output_iso_size_t = std::tuple<std::size_t, std::vector<output_iso_b_t>>;           // size, iso_size
-    // using output_iso_z_t = std::tuple<std::size_t, stats_t, std::vector<output_iso_size_t>>;  // z, ctruth, iso_z
-    // using output_iso_k_t = std::tuple<std::size_t, stats_t, std::vector<output_iso_z_t>>;     // k, truth, iso_k
-    // using output_t = std::vector<output_iso_k_t>;
     for (const auto& [read, header] : fimpera_lib::generators::ReadReader(queryFileName)) {
         for (std::size_t k_i = 0; k_i < ks.size(); k_i++) {
-            std::vector<int> res_truth_k;  // TODO = truth.queryRead(read);
+            const fimpera<TruthInTheShapeOfAnAMQ> truth = std::get<1>(input[k_i]);
+            std::vector<int> res_truth_k = truth.queryRead(read);
             for (std::size_t z_i = 0; z_i < ks.size(); z_i++) {
                 for (std::size_t size_i = 0; size_i < ks.size(); size_i++) {
                     for (std::size_t b_i = 0; b_i < ks.size(); b_i++) {
@@ -407,18 +309,6 @@ output_t queryMatrix(const std::string& indexBaseFilename,
         }
     }
     return output;
-
-    // for (const auto& [k, truth_index, iso_k_vector] : input) {
-    //     for (const auto& [z, ctruth_index, iso_z_vector] : iso_k_vector) {
-    //         for (const auto& [size, iso_size_vector] : iso_z_vector) {
-    //             for (const auto& [b, filter] : iso_size_vector) {
-    //                 // for (const auto& filter : iso_b_vector) {
-    //                 //     //
-    //                 // }
-    //             }
-    //         }
-    //     }
-    // }
 }
 
 std::string toString(stats_t x) {
@@ -427,12 +317,6 @@ std::string toString(stats_t x) {
 }
 
 void printResultMatrix(output_t all_queries_reponses) {
-    // using output_iso_b_t = std::tuple<std::size_t, stats_t>;                                  // b, iso_b
-    // using output_iso_size_t = std::tuple<std::size_t, std::vector<output_iso_b_t>>;           // size, iso_size
-    // using output_iso_z_t = std::tuple<std::size_t, stats_t, std::vector<output_iso_size_t>>;  // z, ctruth, iso_z
-    // using output_iso_k_t = std::tuple<std::size_t, std::vector<output_iso_z_t>>;              // k, ~~truth~~, iso_k
-    // using output_t = std::vector<output_iso_k_t>;
-
     for (const auto& [k, iso_z_vector] : all_queries_reponses) {
         for (const auto& [z, ctruth_stat, iso_size_vector] : iso_z_vector) {
             for (const auto& [size, iso_b_vector] : iso_size_vector) {
@@ -445,56 +329,13 @@ void printResultMatrix(output_t all_queries_reponses) {
 }
 void compareWithTruth(const std::string& indexBaseFilename,
                       const std::string& KMCFilename,
-                      const std::string& queryFileName) /*
-                       const std::vector<std::size_t>& ks,
-                       const std::vector<std::size_t>& zs,
-                       const std::vector<std::size_t>& sizes,
-                       const std::vector<std::size_t>& bs)*/
-{
+                      const std::string& queryFileName) {
     const std::vector<std::size_t>& ks = {31};
     const std::vector<std::size_t>& zs = {0, 3, 5};
     const std::vector<std::size_t>& sizes = {11000};
     const std::vector<std::size_t>& bs = {1, 3, 5};
     output_t all_queries_reponses = queryMatrix(indexBaseFilename, KMCFilename, queryFileName, false, ks, zs, sizes, bs);
     printResultMatrix(all_queries_reponses);
-    // TODO move to an evaluation module
-    // read / create indexes
-    /// path/name_k${k}_z${z}_s${space}_b${b}.
-    // crete input
-    // const auto& [k, truth_index, iso_k_vector] = ks;
-    // for (const auto& [z, ctruth_index, iso_z_vector] : iso_k_vector) {
-    //     for (const auto& [size, iso_size_vector] : iso_z_vector) {
-    //         for (const auto& [b, iso_b_vector] : iso_size_vector) {
-    //             for (const auto& filter : iso_b_vector) {
-    //             }
-    //         }
-    //     }
-    // }
-
-    // const fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(indexFilename);
-    // std::cout << "index BF in (ms)=" << since(start).count() << std::endl;
-    // const fimpera<TruthInTheShapeOfAnAMQ> truth = fimpera<TruthInTheShapeOfAnAMQ>(KMCFilename, index.getK(), 0, index.getCanonical(), size, nbBuckets);
-    // std::cout << "index truth in (ms)=" << since(start).count() << std::endl;
-
-    // fimpera<TruthInTheShapeOfAnAMQ> constrution_truth = fimpera<TruthInTheShapeOfAnAMQ>(KMCFilename, index.getK(), index.getz(), index.getCanonical(), size, nbBuckets);
-
-    // std::vector<index_and_truth> idx{{index, constrution_truth}, {index, constrution_truth}};
-
-    // std::vector<std::tuple<stats, stats>> st = queryLowMemory(truth, idx, queryFile);
-    // for (const auto& s : st) {
-    //     const auto& [tp, tn, fp, fn] = std::get<0>(s);
-    //     std::cout << tp << " " << tn << " " << fp << " " << fn << std::endl;
-    //     std::cout << "fpr = " << ((double)fp) / ((double)(fp + tn)) << std::endl;
-
-    //     const auto& [tpc, tnc, fpc, fnd] = std::get<1>(s);
-    //     std::cout << tpc << " " << tnc << " " << fpc << " " << fnd << std::endl;
-    //     std::cout << "fprc = " << ((double)fpc) / ((double)(fpc + tnc)) << std::endl;
-    // }
-
-    // const std::string name = std::to_string(index.getK()) + "_" + std::to_string(index.getz()) + "_" + std::to_string(nbBuckets);
-
-    // toFileTXT("histo_" + name + ".txt", getHistogram(index_response, truth_response));
-    // toFileTXT("histo_construction_" + name + ".txt", getHistogram(construction_truth_response, truth_response));
 }
 
 int main(int argc, char* argv[]) {
@@ -503,19 +344,12 @@ int main(int argc, char* argv[]) {
     program.add_argument("input_filename").help("index you want to query");
     program.add_argument("query_filename").help("file you want to query against the index");
     program.add_argument("kmc_filename").help("kmc file that contains the truth for the Kmers");
-    // program.add_argument("K").help("size of Kmers").scan<'i', int>();
-    // program.add_argument("K").help("kmc file that contains the truth for the Kmers");
 
     parse(program, argc, argv);
-    // optional arguments
-    // TODO use value stored in filter
-    // program.add_argument("K").help("size of Kmers").scan<'i', int>();
-    // program.add_argument("-z").help("value of z (cf paper of findere)").default_value(3).scan<'i', int>();
 
     const std::string index_filename = program.get("input_filename");
     const std::string query_filename = program.get("query_filename");
     const std::string kmc_filename = program.get("kmc_filename");
-    // const int K = program.get<int>("K");
 
-    compareWithTruth(index_filename, kmc_filename, query_filename);  //, 1, 1, K);  // TODO copy data from index ?
+    compareWithTruth(index_filename, kmc_filename, query_filename);
 }
