@@ -171,7 +171,7 @@ auto since(std::chrono::time_point<clock_t, duration_t> const& start) {
     return std::chrono::duration_cast<result_t>(clock_t::now() - start);
 }
 
-void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAnAMQ>& ctruth, fimpera<TruthInTheShapeOfAnAMQ>& truth, const std::string& filename) {
+void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAnAMQ>& truth, fimpera<TruthInTheShapeOfAnAMQ>& ctruth, const std::string& filename) {
     FileManager reader = FileManager();
     reader.addFile(filename);
     std::string current_read;
@@ -203,7 +203,7 @@ void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAn
         fp += fpp;
         fn += fnp;
 
-        const auto& [tpcp, tncp, fpcp, fncp] = compareVectors(res, res_truth);
+        const auto& [tpcp, tncp, fpcp, fncp] = compareVectors(res_ctruth, res_truth);
         tpc += tpcp;
         tnc += tncp;
         fpc += fpcp;
