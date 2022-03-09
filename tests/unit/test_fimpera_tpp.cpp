@@ -126,3 +126,53 @@ TEST(fimpera_test_suite_fimpera, query) {
     std::vector<int> expected = {1, 1, 1, 1, 0, 0, 1, 1, 1, 1};
     EXPECT_EQ(response, expected);
 }
+
+TEST(fimpera_test_suite_fimpera, testStrategyEqualityDefault) {
+    const std::string f1 = "../../tests/unit/data/index_1000LinesTest_identity_strategy_as_default.idx";
+    const std::string f2 = "../../tests/unit/data/test1000Lines.idx";
+
+    fimpera<countingBF::CBF> identityIdx = fimpera<countingBF::CBF>(f1);
+    fimpera<countingBF::CBF> noStrategyIdx = fimpera<countingBF::CBF>(f2);
+
+    EXPECT_EQ(identityIdx, noStrategyIdx);
+}
+
+TEST(fimpera_test_suite_fimpera, testStrategyEqualityChosen) {
+    const std::string f1 = "../../tests/unit/data/index_1000LinesTest_identity_strategy_chosen.idx";
+    const std::string f2 = "../../tests/unit/data/test1000Lines.idx";
+
+    fimpera<countingBF::CBF> identityIdx = fimpera<countingBF::CBF>(f1);
+    fimpera<countingBF::CBF> noStrategyIdx = fimpera<countingBF::CBF>(f2);
+
+    EXPECT_EQ(identityIdx, noStrategyIdx);
+}
+
+TEST(fimpera_test_suite_fimpera, testStrategyInequality) {
+    const std::string f1 = "../../tests/unit/data/index_1000LinesTest_log2_strategy.idx";
+    const std::string f2 = "../../tests/unit/data/test1000Lines.idx";
+
+    fimpera<countingBF::CBF> log2 = fimpera<countingBF::CBF>(f1);
+    fimpera<countingBF::CBF> noStrategyIdx = fimpera<countingBF::CBF>(f2);
+
+    EXPECT_FALSE(log2 == noStrategyIdx);
+}
+
+TEST(fimpera_test_suite_fimpera, testStrategyInequalitySameContentDifferentName) {
+    const std::string f1 = "../../tests/unit/data/index_1000LinesTest_identity_strategy_but_the_inner_name_is_called_log2.idx";
+    const std::string f2 = "../../tests/unit/data/test1000Lines.idx";
+
+    fimpera<countingBF::CBF> log2InName = fimpera<countingBF::CBF>(f1);
+    fimpera<countingBF::CBF> defaultIdx = fimpera<countingBF::CBF>(f2);
+
+    EXPECT_FALSE(log2InName == defaultIdx);
+}
+
+TEST(fimpera_test_suite_fimpera, testStrategyInequalitySameNameDifferentContent) {
+    const std::string f1 = "../../tests/unit/data/index_1000LinesTest_identity_strategy_but_the_inner_name_is_called_log2.idx";
+    const std::string f2 = "../../tests/unit/data/index_1000LinesTest_log2_strategy.idx";
+
+    fimpera<countingBF::CBF> identityIdx = fimpera<countingBF::CBF>(f1);
+    fimpera<countingBF::CBF> defaultIdx = fimpera<countingBF::CBF>(f2);
+
+    EXPECT_FALSE(identityIdx == defaultIdx);
+}

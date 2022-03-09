@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fimpera-lib/abundanceToIdentifierStrategy.hpp>
 #include <string>
 #include <tuple>
 
@@ -15,9 +16,14 @@ class fimpera {
     unsigned int _z;
     const static std::string uuid0;
     const static std::string description;
+    std::string _strategy;
 
    public:
     fimpera(const std::string& filename, const int& K, const int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets = 1);
+    template <typename U>
+    fimpera(const U& strategyWrapper, const std::string& filename, const int& K, const int& z, bool canonical, uint64_t nbBits);
+    template <typename U>
+    fimpera(const U& strategyWrapper, const std::string& filename, const int& K, const int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets);
     fimpera(const std::string& filename);
     void query(const std::string& filename, CustomResponse& response) const;
     std::vector<int> queryRead(const std::string& read) const;
@@ -27,10 +33,11 @@ class fimpera {
     bool getCanonical() const;
     int getK() const;
     int getz() const;
+    std::string getStrategyName() const;
 
     // operator
     bool operator==(const fimpera<T>& that) const {
-        return ((this->_k == that._k) && (this->_z == that._z) && (this->_canonical == that._canonical) && (this->_filter == that._filter));  // TODO should I check for z too ? for uuid ?
+        return ((this->_k == that._k) && (this->_z == that._z) && (this->_canonical == that._canonical) && (this->_filter == that._filter) && (this->_strategy == that._strategy));  // TODO should I check for z too ? for uuid ?
     }
 
     ~fimpera();

@@ -1,4 +1,5 @@
 #include <fimpera-lib/CBF.hpp>
+#include <fimpera-lib/abundanceToIdentifierStrategy.hpp>
 #include <fimpera-lib/fimpera.hpp>
 #include <iostream>
 
@@ -20,6 +21,10 @@ int main(int argc, char* argv[]) {
     std::cout << program.get<std::size_t>("size") << std::endl;
     std::cout << (int)program.get<std::size_t>("size") << std::endl;
     // create the filter
+
+    abundanceToIdentifierStrategy::identity idStrategy = abundanceToIdentifierStrategy::identity();
+    abundanceToIdentifierStrategy::log2 logStrategy = abundanceToIdentifierStrategy::log2();
+
     fimpera<countingBF::CBF>
         f(program.get("input_filename"), program.get<int>("-K"), program.get<int>("-z"), program["--canonical"] == true, program.get<std::size_t>("size"), program.get<int>("-b"));
     // save it

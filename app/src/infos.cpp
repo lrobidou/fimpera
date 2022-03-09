@@ -20,4 +20,7 @@ int main(int argc, char* argv[]) {
     std::cout << "    uuid: " << uuid << std::endl;
     std::cout << "    k: " << k << std::endl;
     std::cout << "    z: " << z << std::endl;
+    if (jsonString.size() != 0) {
+        std::cout << jsonString << std::endl;
+    }
 }
