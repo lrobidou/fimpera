@@ -126,6 +126,17 @@ void inline toFileTXT(std::string outfilename, robin_hood::unordered_map<int, in
     }
 }
 
+void inline toFileTXT(std::string outfilename, std::vector<uint64_t> v) {
+    remove(outfilename.c_str());
+
+    // print keys and values to file
+    std::ofstream outFile(outfilename);
+    for (const auto& x : v) {
+        outFile << x << ",";
+    }
+    outFile << "\n";
+}
+
 void inline toFileTXT(std::string outfilename, robin_hood::unordered_map<int, std::vector<int>> map) {
     remove(outfilename.c_str());
 
@@ -183,8 +194,20 @@ auto since(std::chrono::time_point<clock_t, duration_t> const& start) {
     return std::chrono::duration_cast<result_t>(clock_t::now() - start);
 }
 
-void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAnAMQ>& truth, fimpera<TruthInTheShapeOfAnAMQ>& ctruth, const std::string& filename) {
-    robin_hood::unordered_map<int, std::vector<int>> histogram;
+void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAnAMQ>& truth, const std::string& filename, int b) {
+    std::size_t size = pow(2, b);
+    std::vector<std::vector<uint64_t>> matrix(size);
+    for (std::size_t i = 0; i < size; i++) {
+        matrix[i] = std::vector<uint64_t>(size, 0);
+    }
+
+    for (std::size_t i = 0; i < size; i++) {
+        for (std::size_t j = 0; j < size; j++) {
+            std::cout << matrix[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
     FileManager reader = FileManager();
     reader.addFile(filename);
     std::string current_read;
@@ -193,11 +216,6 @@ void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAn
     uint64_t tn = 0;
     uint64_t fp = 0;
     uint64_t fn = 0;
-
-    uint64_t tpc = 0;
-    uint64_t tnc = 0;
-    uint64_t fpc = 0;
-    uint64_t fnc = 0;
 
     uint64_t nbIterMax = 100000;
     uint64_t i = 0;
@@ -208,10 +226,15 @@ void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAn
 
         std::vector<int> res = index.queryRead(current_read);
         std::vector<int> res_truth = truth.queryRead(current_read);
-        std::vector<int> res_ctruth = ctruth.queryRead(current_read);
-        for (int j = 0; i < res.size(); j++) {
-            push(histogram, res_truth[i], res[i]);
+        std::cout << "before push" << std::endl;
+        std::cout << res.size() << std::endl;
+        for (std::size_t j = 0; j < res.size(); j++) {
+            // if (j % 100000 == 0) {
+            // std::cout << j << " " << res.size() << std::endl;
+            // }
+            matrix[res_truth[j]][res[j]] += 1;
         }
+        std::cout << "done" << std::endl;
 
         const auto& [tpp, tnp, fpp, fnp] = compareVectors(res, res_truth);
         tp += tpp;
@@ -219,21 +242,19 @@ void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAn
         fp += fpp;
         fn += fnp;
 
-        const auto& [tpcp, tncp, fpcp, fncp] = compareVectors(res_ctruth, res_truth);
-        tpc += tpcp;
-        tnc += tncp;
-        fpc += fpcp;
-        fnc += fncp;
-
         // response.processResult(res, _k + _z, current_header, current_read);
         i++;
     }
-    toFileTXT("histo_diff_" + filename + "_" + std::to_string(index.getK()) + "_" + std::to_string(index.getz()) + ".txt", histogram);
-    std::cout << tp << " " << tn << " " << fp << " " << fn << std::endl;
-    std::cout << "fpr = " << ((double)fp) / ((double)(fp + tn)) << std::endl;
-
-    std::cout << tpc << " " << tnc << " " << fpc << " " << fnc << std::endl;
-    std::cout << "fprc = " << ((double)fpc) / ((double)(fpc + tnc)) << std::endl;
+    for (std::size_t i = 0; i < size; i++) {
+        for (std::size_t j = 0; j < size; j++) {
+            std::cout << matrix[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+    // toFileTXT("histo_diff_" + filename + "_" + std::to_string(index.getK()) + "_" + std::to_string(index.getz()) + ".txt", histogram);
+    // toFileTXT("histo_diff_correct_responses_" + filename + "_" + std::to_string(index.getK()) + "_" + std::to_string(index.getz()) + ".txt", histogram_exact);
+    // std::cout << tp << " " << tn << " " << fp << " " << fn << std::endl;
+    // std::cout << "fpr = " << ((double)fp) / ((double)(fp + tn)) << std::endl;
 }
 
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
@@ -245,8 +266,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
     return str;
 }
 
-void compareWithTruth(const std::string& indexFilenameTemplate, const std::string& KMCFilename, const std::string& queryFile, uint64_t size, uint64_t nbBuckets, std::size_t K) {
-    const std::vector<int> zs = {0, 1, 2, 3, 4, 5, 6, 10, 12, 15, 18, 21, 24, 27, 30};
+void compareWithTruth(const std::string& indexFilenameTemplate, const std::string& KMCFilename, const std::string& queryFile, uint64_t size, uint64_t nbBuckets, std::size_t K, int b) {
+    const std::vector<int> zs = {0};
     auto start = std::chrono::steady_clock::now();
 
     fimpera<TruthInTheShapeOfAnAMQ> truth = fimpera<TruthInTheShapeOfAnAMQ>(KMCFilename, K, 0, false, size, nbBuckets);
@@ -263,10 +284,7 @@ void compareWithTruth(const std::string& indexFilenameTemplate, const std::strin
         fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(indexFilename);
         std::cout << "index BF in (ms)=" << since(start_of_this_z).count() << std::endl;
 
-        fimpera<TruthInTheShapeOfAnAMQ> ctruth = fimpera<TruthInTheShapeOfAnAMQ>(KMCFilename, K, index.getz(), false, size, nbBuckets);
-        std::cout << "index ctruth in (ms)=" << since(start_of_this_z).count() << std::endl;
-
-        queryLowMemory(index, truth, ctruth, queryFile);
+        queryLowMemory(index, truth, queryFile, b);
     }
 
     // TODO move to an evaluation module
@@ -284,12 +302,14 @@ int main(int argc, char* argv[]) {
     program.add_argument("input_filename").help("index you want to query");
     program.add_argument("query_filename").help("file you want to query against the index");
     program.add_argument("kmc_filename").help("kmc file that contains the truth for the Kmers");
+    program.add_argument("b").help("the number of bits per buckets in the filter").scan<'i', int>();
 
     parse(program, argc, argv);
 
     const std::string index_filename = program.get("input_filename");
     const std::string query_filename = program.get("query_filename");
     const std::string kmc_filename = program.get("kmc_filename");
+    const int b = program.get<int>("b");
 
-    compareWithTruth(index_filename, kmc_filename, query_filename, 1, 1, 31);
+    compareWithTruth(index_filename, kmc_filename, query_filename, 1, 1, 31, b);
 }
