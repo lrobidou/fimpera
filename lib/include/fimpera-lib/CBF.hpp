@@ -24,6 +24,8 @@ class CBF {
     uint64_t get(const std::string& kmer) const;
     void dump(std::ofstream& fout) const;
     bool operator==(const CBF& that) const;
+
+    std::vector<std::size_t> getStats() const;
     ~CBF();
 };
 

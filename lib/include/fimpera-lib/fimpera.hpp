@@ -28,6 +28,7 @@ class fimpera {
     void query(const std::string& filename, CustomResponse& response) const;
     std::vector<int> queryRead(const std::string& read) const;
     void save(const std::string& filename) const;
+    const T& getInnerFilter() const;
 
     // getter
     bool getCanonical() const;

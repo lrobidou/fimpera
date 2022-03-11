@@ -209,6 +209,11 @@ void fimpera<T>::save(const std::string& filename) const {
 }
 
 template <typename T>
+const T& fimpera<T>::getInnerFilter() const {
+    return this->_filter;
+}
+
+template <typename T>
 bool fimpera<T>::getCanonical() const {
     return this->_canonical;
 }
