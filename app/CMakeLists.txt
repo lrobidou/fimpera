@@ -40,3 +40,7 @@ target_link_libraries(fimpera_abundance ${LIBRARY_NAME} ${APP_LINK} z)
 add_executable(fimpera_truth_id_diff ${APP_SOURCE_DIR}/truth_identifier_diff.cpp)
 add_dependencies(fimpera_truth_id_diff ${APP_DEPENDENCIES})
 target_link_libraries(fimpera_truth_id_diff ${LIBRARY_NAME} ${APP_LINK} z)
+
+add_executable(fimpera_stats_filter ${APP_SOURCE_DIR}/stats_filter.cpp)
+add_dependencies(fimpera_stats_filter ${APP_DEPENDENCIES})
+target_link_libraries(fimpera_stats_filter ${LIBRARY_NAME} ${APP_LINK} z)
