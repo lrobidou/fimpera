@@ -48,6 +48,7 @@ std::tuple<std::vector<uint64_t>, uint64_t> CBF::get(const std::vector<uint64_t>
 
 CBF::CBF(uint64_t nbBits, uint64_t nbBitsPerCell, uint64_t nbHashFunctions) : _bits(nbBits, false), _nbBitsPerCell(nbBitsPerCell), _nbHashFunctions(nbHashFunctions) {
     assert(nbBits > 0);
+    _mask = pow(2, _nbBitsPerCell - 1);
     _nbCells = nbBits / _nbBitsPerCell;
     _limitValueInBucket = pow(2, _nbBitsPerCell) - 1;
 }
@@ -67,6 +68,7 @@ CBF::CBF(std::ifstream& fin) {
     _nbHashFunctions = getFromFile<uint64_t>(fin);
 
     _limitValueInBucket = pow(2, _nbBitsPerCell) - 1;
+    _mask = pow(2, _nbBitsPerCell - 1);
 
     std::vector<bool>::size_type n;
     fin.read((char*)&n, sizeof(std::vector<bool>::size_type));
@@ -79,7 +81,7 @@ CBF::CBF(std::ifstream& fin) {
         unsigned char aggr;
         fin.read((char*)&aggr, sizeof(unsigned char));
         // we have a byte to store in the filter
-        // let's select its bit one by one and place them in the filter
+        // let's select its bits one by one and place them in the filter
         for (unsigned char mask = 1; mask > 0 && i < n; ++i, mask <<= 1)
             _bits.at(i) = aggr & mask;
     }
@@ -111,20 +113,13 @@ uint64_t CBF::set(const std::string& kmer, uint64_t occurrence) {
         }
 
         // save data
-        // first, convert a uint64_t to a std::vector<bool>
-        std::vector<bool> tmp(_nbBitsPerCell);
-        for (uint64_t i = 0; i < _nbBitsPerCell; i++) {
-            tmp[i] = valueInFilterForThatIndex % 2;
-            valueInFilterForThatIndex >>= 1;
-        }
-
-        // then, save this vector in the _bits vector
+        uint64_t mask = _mask;
         uint64_t start = index * _nbBitsPerCell;
         for (uint64_t j = 0; j < _nbBitsPerCell; j++) {
-            _bits[start + j] = tmp[_nbBitsPerCell - 1 - j];
+            _bits[start + j] = valueInFilterForThatIndex & mask;
+            mask >>= 1;
         }
     }
-    // OPTIMIZE convert from uint64 to vector directly in the _bits vector (spares one memory allocation per insertion)
 
     return occurrence;
 }

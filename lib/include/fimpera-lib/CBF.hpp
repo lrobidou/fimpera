@@ -16,6 +16,7 @@ class CBF {
     uint64_t _nbCells;
     uint64_t _nbHashFunctions;
     uint64_t _limitValueInBucket;
+    uint64_t _mask;
     static const std::string _uuid;
     std::vector<uint64_t> getIndexes(const std::string& kmer) const;
     uint64_t get(const uint64_t& index) const;
