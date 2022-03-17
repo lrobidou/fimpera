@@ -162,7 +162,6 @@ fimpera<T>::fimpera(const std::string& filename) {
     if (jsonStr.length() != 0) {
         nlohmann::json j = nlohmann::json::parse(jsonStr);
         if (j.contains("strategy")) {
-            std::cout << "strategy in " << filename << std::endl;
             this->_strategy = j["strategy"];
         } else {
             this->_strategy = "identity";
