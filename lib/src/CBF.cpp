@@ -141,7 +141,7 @@ bool CBF::operator==(const CBF& that) const {
         (this->_bits == that._bits));
 }
 
-// returns a vector such that vector[i] = len([x for x in vector if x == i])
+// returns a vector such that vector[i] = len([x for x in filter if x == i])
 std::vector<std::size_t> CBF::getStats() const {
     std::vector<std::size_t> v(_limitValueInBucket + 1, 0);
 

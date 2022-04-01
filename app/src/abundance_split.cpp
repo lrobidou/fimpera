@@ -7,6 +7,16 @@
 
 #include "args.hpp"
 
+/*
+    Input: a kmc file
+    Output: a histogram of the kmers, in a file.
+
+    Histogram looks like:
+    abundance: number of time it was seen
+
+    (abundances are sorted)
+
+*/
 inline void add(robin_hood::unordered_map<uint64_t, uint64_t>& map, uint64_t key, uint64_t valueToAdd) {
     robin_hood::unordered_map<uint64_t, uint64_t>::const_iterator got = map.find(key);
     if (got != map.end()) {                   // found

@@ -3,71 +3,11 @@
 
 #include <chrono>
 #include <fimpera-lib/CBF.hpp>
+#include <fimpera-lib/ResultGetter.hpp>
+#include <fimpera-lib/evaluation/UnlimitedTruthInTheShapeOfAnAMQ.hpp>
 #include <fimpera-lib/fimpera.hpp>
 
 #include "args.hpp"
-
-class ResultGetter : public CustomResponse {
-   private:
-    std::vector<int> entireResponse;
-
-   public:
-    ResultGetter() {}
-
-    void
-    processResult(const std::vector<int>& res, const unsigned int& K, const std::string& current_header, const std::string& current_read) {
-        entireResponse.insert(std::end(entireResponse), std::begin(res), std::end(res));
-    }
-
-    std::vector<int> getResult() {
-        return entireResponse;
-    }
-};
-
-class TruthInTheShapeOfAnAMQ {
-   private:
-    uint64_t _nbBuckets;
-    uint64_t _nbCells;
-    uint64_t _limitValueInBucket;
-    robin_hood::unordered_map<std::string, int> _t;
-
-   public:
-    TruthInTheShapeOfAnAMQ(int nbBits, int nbBuckets) : _nbBuckets(nbBuckets) {
-        _nbCells = nbBits / _nbBuckets;
-        _limitValueInBucket = pow(2, _nbBuckets) - 1;
-    }
-
-    bool set(const std::string& x, int occurrence = 1) {
-        // get existing data
-        int data = get(x);
-
-        // compute new value of data
-        if (data < occurrence) {
-            data = occurrence;
-            // TODO discuss with Pierre
-            // if (data > _limitValueInBucket) {
-            //     data = _limitValueInBucket;
-            // }
-        }
-
-        auto it = _t.find(x);
-        if (it != _t.end()) {
-            it->second = data;
-        } else {
-            _t.insert({x, data});
-        }
-        return data;
-    }
-
-    int get(const std::string& x) const {
-        auto it = _t.find(x);
-        if (it != _t.end()) {
-            return it->second;
-        } else {
-            return 0;
-        }
-    }
-};
 
 inline void add(robin_hood::unordered_map<int, int>& map, const int& key, const int& valueToAdd) {
     robin_hood::unordered_map<int, int>::const_iterator got = map.find(key);
@@ -171,7 +111,7 @@ auto since(std::chrono::time_point<clock_t, duration_t> const& start) {
     return std::chrono::duration_cast<result_t>(clock_t::now() - start);
 }
 
-void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAnAMQ>& truth, fimpera<TruthInTheShapeOfAnAMQ>& ctruth, const std::string& filename) {
+void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<UnlimitedTruthInTheShapeOfAnAMQ>& truth, fimpera<UnlimitedTruthInTheShapeOfAnAMQ>& ctruth, const std::string& filename) {
     FileManager reader = FileManager();
     reader.addFile(filename);
     std::string current_read;
@@ -232,7 +172,7 @@ void compareWithTruth(const std::string& indexFilenameTemplate, const std::strin
     const std::vector<int> zs = {0, 1, 2, 3, 4, 5, 6, 10, 12, 15, 18, 21, 24, 27, 30};
     auto start = std::chrono::steady_clock::now();
 
-    fimpera<TruthInTheShapeOfAnAMQ> truth = fimpera<TruthInTheShapeOfAnAMQ>(KMCFilename, K, 0, false, size, nbBuckets);
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, K, 0, false, size, nbBuckets);
     std::cout << "index truth in (ms)=" << since(start).count() << std::endl;
 
     for (int z : zs) {
@@ -246,7 +186,7 @@ void compareWithTruth(const std::string& indexFilenameTemplate, const std::strin
         fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(indexFilename);
         std::cout << "index BF in (ms)=" << since(start_of_this_z).count() << std::endl;
 
-        fimpera<TruthInTheShapeOfAnAMQ> ctruth = fimpera<TruthInTheShapeOfAnAMQ>(KMCFilename, K, index.getz(), false, size, nbBuckets);
+        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, K, index.getz(), false, size, nbBuckets);
         std::cout << "index ctruth in (ms)=" << since(start_of_this_z).count() << std::endl;
 
         queryLowMemory(index, truth, ctruth, queryFile);

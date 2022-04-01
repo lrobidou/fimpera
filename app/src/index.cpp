@@ -18,8 +18,6 @@ int main(int argc, char* argv[]) {
     program.add_argument("--canonical").help("will fimpera index canonical Kmers ?").default_value(false).implicit_value(true);
 
     parse(program, argc, argv);
-    std::cout << program.get<std::size_t>("size") << std::endl;
-    std::cout << (int)program.get<std::size_t>("size") << std::endl;
     // create the filter
 
     abundanceToIdentifierStrategy::identity idStrategy = abundanceToIdentifierStrategy::identity();

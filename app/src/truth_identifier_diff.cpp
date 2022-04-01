@@ -3,71 +3,12 @@
 
 #include <chrono>
 #include <fimpera-lib/CBF.hpp>
+#include <fimpera-lib/evaluation/LimitedTruthInTheShapeOfAnAMQ.hpp>
+#include <fimpera-lib/evaluation/UnlimitedTruthInTheShapeOfAnAMQ.hpp>
 #include <fimpera-lib/fimpera.hpp>
+#include <string>
 
 #include "args.hpp"
-
-class ResultGetter : public CustomResponse {
-   private:
-    std::vector<int> entireResponse;
-
-   public:
-    ResultGetter() {}
-
-    void
-    processResult(const std::vector<int>& res, const unsigned int& K, const std::string& current_header, const std::string& current_read) {
-        entireResponse.insert(std::end(entireResponse), std::begin(res), std::end(res));
-    }
-
-    std::vector<int> getResult() {
-        return entireResponse;
-    }
-};
-
-class TruthInTheShapeOfAnAMQ {
-   private:
-    uint64_t _nbBuckets;
-    uint64_t _nbCells;
-    uint64_t _limitValueInBucket;
-    robin_hood::unordered_map<std::string, int> _t;
-
-   public:
-    TruthInTheShapeOfAnAMQ(int nbBits, int nbBuckets) : _nbBuckets(nbBuckets) {
-        _nbCells = nbBits / _nbBuckets;
-        _limitValueInBucket = pow(2, _nbBuckets) - 1;
-    }
-
-    bool set(const std::string& x, int occurrence = 1) {
-        // get existing data
-        int data = get(x);
-
-        // compute new value of data
-        if (data < occurrence) {
-            data = occurrence;
-            // TODO discuss with Pierre
-            // if (data > _limitValueInBucket) {
-            //     data = _limitValueInBucket;
-            // }
-        }
-
-        auto it = _t.find(x);
-        if (it != _t.end()) {
-            it->second = data;
-        } else {
-            _t.insert({x, data});
-        }
-        return data;
-    }
-
-    int get(const std::string& x) const {
-        auto it = _t.find(x);
-        if (it != _t.end()) {
-            return it->second;
-        } else {
-            return 0;
-        }
-    }
-};
 
 inline void add(robin_hood::unordered_map<int, int>& map, const int& key, const int& valueToAdd) {
     robin_hood::unordered_map<int, int>::const_iterator got = map.find(key);
@@ -194,28 +135,51 @@ auto since(std::chrono::time_point<clock_t, duration_t> const& start) {
     return std::chrono::duration_cast<result_t>(clock_t::now() - start);
 }
 
-void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAnAMQ>& truth, const std::string& filename, int b) {
-    std::size_t size = pow(2, b);
-    std::vector<std::vector<uint64_t>> matrix(size);
-    for (std::size_t i = 0; i < size; i++) {
-        matrix[i] = std::vector<uint64_t>(size, 0);
+std::vector<std::vector<uint64_t>> create_matrix(std::size_t matrix_size) {
+    std::vector<std::vector<uint64_t>> matrix(matrix_size);
+    for (std::size_t i = 0; i < matrix_size; i++) {
+        matrix[i] = std::vector<uint64_t>(matrix_size, 0);
     }
+    return matrix;
+}
 
-    for (std::size_t i = 0; i < size; i++) {
-        for (std::size_t j = 0; j < size; j++) {
+void print_matrix(std::vector<std::vector<uint64_t>> matrix) {
+    std::size_t matrix_size = matrix.size();
+    for (std::size_t i = 0; i < matrix_size; i++) {
+        for (std::size_t j = 0; j < matrix_size; j++) {
             std::cout << matrix[i][j] << " ";
         }
         std::cout << std::endl;
     }
+}
+
+void queryLowMemory(
+    const fimpera<UnlimitedTruthInTheShapeOfAnAMQ>& unlimited_truth,
+    const fimpera<LimitedTruthInTheShapeOfAnAMQ>& limited_truth,
+    const fimpera<countingBF::CBF>& index,
+    const fimpera<UnlimitedTruthInTheShapeOfAnAMQ>& unlimited_ctruth,
+    const fimpera<LimitedTruthInTheShapeOfAnAMQ>& limited_ctruth,
+    const fimpera<countingBF::CBF>& index_z,
+    const std::string& filename,
+    const int& b) {
+    // std::size_t matrix_size = pow(2, b);
+    std::size_t matrix_size = 20;  // TODO?
+
+    std::vector<std::vector<uint64_t>> matrix_unlimited_truth = create_matrix(matrix_size);
+    std::vector<std::vector<uint64_t>> matrix_limited_truth = create_matrix(matrix_size);
+    std::vector<std::vector<uint64_t>> matrix_index = create_matrix(matrix_size);
+    std::vector<std::vector<uint64_t>> matrix_unlimited_ctruth = create_matrix(matrix_size);
+    std::vector<std::vector<uint64_t>> matrix_limited_ctruth = create_matrix(matrix_size);
+    std::vector<std::vector<uint64_t>> matrix_index_z = create_matrix(matrix_size);
 
     FileManager reader = FileManager();
     reader.addFile(filename);
     std::string current_read;
 
-    uint64_t tp = 0;
-    uint64_t tn = 0;
-    uint64_t fp = 0;
-    uint64_t fn = 0;
+    // uint64_t tp = 0;
+    // uint64_t tn = 0;
+    // uint64_t fp = 0;
+    // uint64_t fn = 0;
 
     uint64_t nbIterMax = 100000;
     uint64_t i = 0;
@@ -224,40 +188,76 @@ void queryLowMemory(fimpera<countingBF::CBF>& index, fimpera<TruthInTheShapeOfAn
         std::string current_data = reader.get_data();
         std::string current_header = current_data.substr(0, current_data.find('\n'));
 
-        std::vector<int> res = index.queryRead(current_read);
-        std::vector<int> res_truth = truth.queryRead(current_read);
+        // std::vector<int> res = index.queryRead(current_read);
+        // std::vector<int> res_truth = truth.queryRead(current_read);
+        std::vector<int> res_unlimited_truth = unlimited_truth.queryRead(current_read);
+        std::vector<int> res_limited_truth = limited_truth.queryRead(current_read);
+        std::vector<int> res_index = index.queryRead(current_read);
+        std::vector<int> res_unlimited_ctruth = unlimited_ctruth.queryRead(current_read);
+        std::vector<int> res_limited_ctruth = limited_ctruth.queryRead(current_read);
+        std::vector<int> res_index_z = index_z.queryRead(current_read);
         std::cout << "before push" << std::endl;
-        std::cout << res.size() << std::endl;
-        for (std::size_t j = 0; j < res.size(); j++) {
+        // std::cout << res.size() << std::endl;
+        for (std::size_t j = 0; j < res_unlimited_truth.size(); j++) {
             // if (j % 100000 == 0) {
             // std::cout << j << " " << res.size() << std::endl;
             // }
-            matrix[res_truth[j]][res[j]] += 1;
+            matrix_unlimited_truth[res_unlimited_truth[j]][res_unlimited_ctruth[j]] += 1;
+            matrix_limited_truth[res_limited_truth[j]][res_unlimited_ctruth[j]] += 1;
+            matrix_index[res_index[j]][res_unlimited_ctruth[j]] += 1;
+            matrix_unlimited_ctruth[res_unlimited_ctruth[j]][res_unlimited_ctruth[j]] += 1;
+            matrix_limited_ctruth[res_limited_ctruth[j]][res_unlimited_ctruth[j]] += 1;
+            matrix_index_z[res_index_z[j]][res_unlimited_ctruth[j]] += 1;
+            // matrix[res_truth[j]][res[j]] += 1;
         }
-        std::cout << "done" << std::endl;
+        if (i % 100) {
+            std::cout << "read " << i << "done" << std::endl;
+        }
 
-        const auto& [tpp, tnp, fpp, fnp] = compareVectors(res, res_truth);
-        tp += tpp;
-        tn += tnp;
-        fp += fpp;
-        fn += fnp;
+        // const auto& [tpp, tnp, fpp, fnp] = compareVectors(res, res_truth);
+        // tp += tpp;
+        // tn += tnp;
+        // fp += fpp;
+        // fn += fnp;
 
         // response.processResult(res, _k + _z, current_header, current_read);
         i++;
     }
-    for (std::size_t i = 0; i < size; i++) {
-        for (std::size_t j = 0; j < size; j++) {
-            std::cout << matrix[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-    // toFileTXT("histo_diff_" + filename + "_" + std::to_string(index.getK()) + "_" + std::to_string(index.getz()) + ".txt", histogram);
-    // toFileTXT("histo_diff_correct_responses_" + filename + "_" + std::to_string(index.getK()) + "_" + std::to_string(index.getz()) + ".txt", histogram_exact);
-    // std::cout << tp << " " << tn << " " << fp << " " << fn << std::endl;
-    // std::cout << "fpr = " << ((double)fp) / ((double)(fp + tn)) << std::endl;
+
+    std::cout << "    matrix_unlimited_truth" << std::endl;
+    print_matrix(matrix_unlimited_truth);
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "matrix_limited_truth" << std::endl;
+    print_matrix(matrix_limited_truth);
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "matrix_index" << std::endl;
+    print_matrix(matrix_index);
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "matrix_unlimited_ctruth" << std::endl;
+    print_matrix(matrix_unlimited_ctruth);
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "matrix_limited_ctruth" << std::endl;
+    print_matrix(matrix_limited_ctruth);
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "matrix_index_z" << std::endl;
+    print_matrix(matrix_index_z);
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    // print(matrix);
 }
 
-std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+inline std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
     size_t start_pos = 0;
     while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
         str.replace(start_pos, from.length(), to);
@@ -266,50 +266,57 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
     return str;
 }
 
-void compareWithTruth(const std::string& indexFilenameTemplate, const std::string& KMCFilename, const std::string& queryFile, uint64_t size, uint64_t nbBuckets, std::size_t K, int b) {
-    const std::vector<int> zs = {0};
+template <typename Strategy>
+void compareWithTruth(const std::string& KMCFilename, const std::string& queryFile, uint64_t size, std::size_t K, int b, Strategy strategy) {
+    const std::vector<int> zs = {5};
     auto start = std::chrono::steady_clock::now();
 
-    fimpera<TruthInTheShapeOfAnAMQ> truth = fimpera<TruthInTheShapeOfAnAMQ>(KMCFilename, K, 0, false, size, nbBuckets);
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, 0, false, size, b);
+    fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_truth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, 0, false, size, b);
+    fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(strategy, KMCFilename, K, 0, false, size, b);
     std::cout << "index truth in (ms)=" << since(start).count() << std::endl;
 
     for (int z : zs) {
         auto start_of_this_z = std::chrono::steady_clock::now();
         std::cout << "starting analyzing z = " << z << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
+        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, z, false, size, b);
+        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, z, false, size, b);
+        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, K, z, false, size, b);
 
-        std::string indexFilename = ReplaceAll(indexFilenameTemplate, "_z_", "_z" + std::to_string(z) + "_");
-        indexFilename = ReplaceAll(indexFilename, "_k_", "_k" + std::to_string(K) + "_");
-        std::cout << "index filename " << indexFilename << std::endl;
+        // std::string indexFilename = ReplaceAll(indexFilenameTemplate, "_z_", "_z" + std::to_string(z) + "_");
+        // indexFilename = ReplaceAll(indexFilename, "_k_", "_k" + std::to_string(K) + "_");
+        // std::cout << "index filename " << indexFilename << std::endl;
 
-        fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(indexFilename);
-        std::cout << "index BF in (ms)=" << since(start_of_this_z).count() << std::endl;
+        // fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(indexFilename);
+        // std::cout << "index BF in (ms)=" << since(start_of_this_z).count() << std::endl;
 
-        queryLowMemory(index, truth, queryFile, b);
+        queryLowMemory(unlimited_truth, limited_truth, index, unlimited_ctruth, limited_ctruth, index_z, queryFile, b);
     }
-
-    // TODO move to an evaluation module
-    // read / create indexes
-
-    // const std::string name = std::to_string(index.getK()) + "_" + std::to_string(index.getz()) + "_" + std::to_string(nbBuckets);
-
-    // toFileTXT("histo_" + name + ".txt", getHistogram(index_response, truth_response));
-    // toFileTXT("histo_construction_" + name + ".txt", getHistogram(construction_truth_response, truth_response));
 }
 
 int main(int argc, char* argv[]) {
     argparse::ArgumentParser program("fimpera_index", "0.0.1");
     // mandatory arguments
-    program.add_argument("input_filename").help("index you want to query");
+    // program.add_argument("input_filename").help("index you want to query");
     program.add_argument("query_filename").help("file you want to query against the index");
     program.add_argument("kmc_filename").help("kmc file that contains the truth for the Kmers");
+    program.add_argument("size").help("output index size").scan<'i', std::size_t>();
+
+    program.add_argument("-K").help("size of Kmers").default_value(31).scan<'i', int>();
+    // program.add_argument("-z").help("value of z (cf paper of findere)").default_value(3).scan<'i', int>();
     program.add_argument("b").help("the number of bits per buckets in the filter").scan<'i', int>();
 
     parse(program, argc, argv);
 
-    const std::string index_filename = program.get("input_filename");
+    // const std::string index_filename = program.get("input_filename");
     const std::string query_filename = program.get("query_filename");
     const std::string kmc_filename = program.get("kmc_filename");
+    const std::size_t size = program.get<std::size_t>("size");
     const int b = program.get<int>("b");
+    const int K = program.get<int>("-K");
+    // const int z = program.get<int>("-z");
+    // abundanceToIdentifierStrategy::identity idStrategy = abundanceToIdentifierStrategy::identity();
+    abundanceToIdentifierStrategy::log2 logStrategy = abundanceToIdentifierStrategy::log2();
 
-    compareWithTruth(index_filename, kmc_filename, query_filename, 1, 1, 31, b);
+    compareWithTruth(kmc_filename, query_filename, size, K, b, logStrategy);
 }

@@ -1,7 +1,11 @@
+#include <robin_hood.h>
+
 #include <fimpera-lib/CBF.hpp>
+#include <fimpera-lib/evaluation/UnlimitedTruthInTheShapeOfAnAMQ.hpp>
 #include <fimpera-lib/fimpera.hpp>
 
 #include "args.hpp"
+
 // Heavily assumes that the filter contains a CBF
 int main(int argc, char* argv[]) {
     argparse::ArgumentParser program("fimpera_index", "0.0.1");
@@ -23,8 +27,8 @@ int main(int argc, char* argv[]) {
     // if (jsonString.size() != 0) {
     //     std::cout << jsonString << std::endl;
     // }
-    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(index_filename);
-    countingBF::CBF filter = f.getInnerFilter();
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> f = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(index_filename, 35, 5, false, 1, 5);
+    UnlimitedTruthInTheShapeOfAnAMQ filter = f.getInnerFilter();
     for (auto x : filter.getStats()) {
         std::cout << x << " ";
     }
