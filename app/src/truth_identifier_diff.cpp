@@ -9,7 +9,26 @@
 #include <string>
 
 #include "args.hpp"
+/*
+Computes a matrix such that
 
+    |   x x x x x x
+    |   x x x x x x
+(1) |   x x x x x x
+    |   x x x x x x
+    |   x x x x x x
+    |
+    |-------------->
+    v       (2)
+
+ 1: unlimited truth
+    limited truth
+    index
+    unlimited ctruth
+    limited ctruth
+    index z
+ 2: unlimited truth
+*/
 inline void add(robin_hood::unordered_map<int, int>& map, const int& key, const int& valueToAdd) {
     robin_hood::unordered_map<int, int>::const_iterator got = map.find(key);
     if (got != map.end()) {                   // found
@@ -161,7 +180,8 @@ void queryLowMemory(
     const fimpera<LimitedTruthInTheShapeOfAnAMQ>& limited_ctruth,
     const fimpera<countingBF::CBF>& index_z,
     const std::string& filename,
-    const int& b) {
+    const int& b,
+    bool wrongKmersToAFile) {
     // std::size_t matrix_size = pow(2, b);
     std::size_t matrix_size = 20;  // TODO?
 
@@ -172,14 +192,30 @@ void queryLowMemory(
     std::vector<std::vector<uint64_t>> matrix_limited_ctruth = create_matrix(matrix_size);
     std::vector<std::vector<uint64_t>> matrix_index_z = create_matrix(matrix_size);
 
+    std::string matrix_unlimited_truth_filename = "matrix_unlimited_truth";
+    std::string matrix_limited_truth_filename = "matrix_limited_truth";
+    std::string matrix_index_filename = "matrix_index";
+    std::string matrix_unlimited_ctruth_filename = "matrix_unlimited_ctruth";
+    std::string matrix_limited_ctruth_filename = "matrix_limited_ctruth";
+    std::string matrix_index_z_filename = "matrix_index_z";
+
+    remove(matrix_unlimited_truth_filename.c_str());
+    remove(matrix_limited_truth_filename.c_str());
+    remove(matrix_index_filename.c_str());
+    remove(matrix_unlimited_ctruth_filename.c_str());
+    remove(matrix_limited_ctruth_filename.c_str());
+    remove(matrix_index_z_filename.c_str());
+
+    std::ofstream matrix_unlimited_truth_file(matrix_unlimited_truth_filename);
+    std::ofstream matrix_limited_truth_file(matrix_limited_truth_filename);
+    std::ofstream matrix_index_file(matrix_index_filename);
+    std::ofstream matrix_unlimited_ctruth_file(matrix_unlimited_ctruth_filename);
+    std::ofstream matrix_limited_ctruth_file(matrix_limited_ctruth_filename);
+    std::ofstream matrix_index_z_file(matrix_index_z_filename);
+
     FileManager reader = FileManager();
     reader.addFile(filename);
     std::string current_read;
-
-    // uint64_t tp = 0;
-    // uint64_t tn = 0;
-    // uint64_t fp = 0;
-    // uint64_t fn = 0;
 
     uint64_t nbIterMax = 100000;
     uint64_t i = 0;
@@ -188,39 +224,51 @@ void queryLowMemory(
         std::string current_data = reader.get_data();
         std::string current_header = current_data.substr(0, current_data.find('\n'));
 
-        // std::vector<int> res = index.queryRead(current_read);
-        // std::vector<int> res_truth = truth.queryRead(current_read);
         std::vector<int> res_unlimited_truth = unlimited_truth.queryRead(current_read);
         std::vector<int> res_limited_truth = limited_truth.queryRead(current_read);
         std::vector<int> res_index = index.queryRead(current_read);
         std::vector<int> res_unlimited_ctruth = unlimited_ctruth.queryRead(current_read);
         std::vector<int> res_limited_ctruth = limited_ctruth.queryRead(current_read);
         std::vector<int> res_index_z = index_z.queryRead(current_read);
-        std::cout << "before push" << std::endl;
-        // std::cout << res.size() << std::endl;
+
+        int k = limited_truth.getK();
+
+        std::vector<std::string> kmers = std::vector<std::string>();
+        kmers.reserve(current_read.size() - k + 1);
+
+        for (std::size_t start = 0; start < current_read.size() - k + 1; start++) {
+            kmers.push_back(current_read.substr(start, k));
+        }
+
         for (std::size_t j = 0; j < res_unlimited_truth.size(); j++) {
-            // if (j % 100000 == 0) {
-            // std::cout << j << " " << res.size() << std::endl;
-            // }
             matrix_unlimited_truth[res_unlimited_truth[j]][res_unlimited_ctruth[j]] += 1;
             matrix_limited_truth[res_limited_truth[j]][res_unlimited_ctruth[j]] += 1;
             matrix_index[res_index[j]][res_unlimited_ctruth[j]] += 1;
             matrix_unlimited_ctruth[res_unlimited_ctruth[j]][res_unlimited_ctruth[j]] += 1;
             matrix_limited_ctruth[res_limited_ctruth[j]][res_unlimited_ctruth[j]] += 1;
             matrix_index_z[res_index_z[j]][res_unlimited_ctruth[j]] += 1;
-            // matrix[res_truth[j]][res[j]] += 1;
-        }
-        if (i % 100) {
-            std::cout << "read " << i << "done" << std::endl;
-        }
 
-        // const auto& [tpp, tnp, fpp, fnp] = compareVectors(res, res_truth);
-        // tp += tpp;
-        // tn += tnp;
-        // fp += fpp;
-        // fn += fnp;
-
-        // response.processResult(res, _k + _z, current_header, current_read);
+            if (wrongKmersToAFile) {
+                if (res_unlimited_ctruth[j] > res_unlimited_truth[j]) {
+                    matrix_unlimited_truth_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_unlimited_truth[j] << "\n";
+                }
+                if (res_unlimited_ctruth[j] > res_limited_truth[j]) {
+                    matrix_limited_truth_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_limited_truth[j] << "\n";
+                }
+                if (res_unlimited_ctruth[j] > res_index[j]) {
+                    matrix_index_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_index[j] << "\n";
+                }
+                if (res_unlimited_ctruth[j] > res_unlimited_ctruth[j]) {
+                    matrix_unlimited_ctruth_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_unlimited_ctruth[j] << "\n";
+                }
+                if (res_unlimited_ctruth[j] > res_limited_ctruth[j]) {
+                    matrix_limited_ctruth_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_limited_ctruth[j] << "\n";
+                }
+                if (res_unlimited_ctruth[j] > res_index_z[j]) {
+                    matrix_index_z_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_index_z[j] << "\n";
+                }
+            }
+        }
         i++;
     }
 
@@ -267,7 +315,7 @@ inline std::string ReplaceAll(std::string str, const std::string& from, const st
 }
 
 template <typename Strategy>
-void compareWithTruth(const std::string& KMCFilename, const std::string& queryFile, uint64_t size, std::size_t K, int b, Strategy strategy) {
+void compareWithTruth(const std::string& KMCFilename, const std::string& queryFile, uint64_t size, std::size_t K, int b, Strategy strategy, bool wrongKmersToAFile) {
     const std::vector<int> zs = {5};
     auto start = std::chrono::steady_clock::now();
 
@@ -290,7 +338,7 @@ void compareWithTruth(const std::string& KMCFilename, const std::string& queryFi
         // fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(indexFilename);
         // std::cout << "index BF in (ms)=" << since(start_of_this_z).count() << std::endl;
 
-        queryLowMemory(unlimited_truth, limited_truth, index, unlimited_ctruth, limited_ctruth, index_z, queryFile, b);
+        queryLowMemory(unlimited_truth, limited_truth, index, unlimited_ctruth, limited_ctruth, index_z, queryFile, b, wrongKmersToAFile);
     }
 }
 
@@ -305,6 +353,7 @@ int main(int argc, char* argv[]) {
     program.add_argument("-K").help("size of Kmers").default_value(31).scan<'i', int>();
     // program.add_argument("-z").help("value of z (cf paper of findere)").default_value(3).scan<'i', int>();
     program.add_argument("b").help("the number of bits per buckets in the filter").scan<'i', int>();
+    program.add_argument("--file").help("should kmers answered wrongly be printed to file").default_value(false).implicit_value(true);
 
     parse(program, argc, argv);
 
@@ -314,9 +363,11 @@ int main(int argc, char* argv[]) {
     const std::size_t size = program.get<std::size_t>("size");
     const int b = program.get<int>("b");
     const int K = program.get<int>("-K");
+    bool wrongKmersToAFile = program.get<bool>("--file");
+    std::cout << "wrongKmersToAFile : " << wrongKmersToAFile << std::endl;
     // const int z = program.get<int>("-z");
     // abundanceToIdentifierStrategy::identity idStrategy = abundanceToIdentifierStrategy::identity();
     abundanceToIdentifierStrategy::log2 logStrategy = abundanceToIdentifierStrategy::log2();
 
-    compareWithTruth(kmc_filename, query_filename, size, K, b, logStrategy);
+    compareWithTruth(kmc_filename, query_filename, size, K, b, logStrategy, wrongKmersToAFile);
 }
