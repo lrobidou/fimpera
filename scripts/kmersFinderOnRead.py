@@ -19,7 +19,7 @@ def grep(filename, the_set, k, out):
                     if kmer in the_set:
                         kmers.add(kmer)
                 if kmers:
-                    out.write(ligne)
+                    output.write(ligne)
                     output.write("-> " + kmer + "\n")
 
 
@@ -38,7 +38,7 @@ def main():
 
     filename_kmers = args.filename_kmers
     filename_fast = args.filename_fast
-    k = args.k
+    k = int(args.k)
     out = args.output
 
     kmers = kmers_file_to_kmers_set(filename_kmers)
