@@ -189,13 +189,16 @@ void queryLowMemory(
     std::vector<std::vector<uint64_t>> matrix_ctruth_vs_truth = create_matrix(matrix_size);
     std::vector<std::vector<uint64_t>> matrix_index_z_vs_truth = create_matrix(matrix_size);
     std::vector<std::vector<uint64_t>> matrix_index_vs_index_z = create_matrix(matrix_size);
+    std::vector<std::vector<uint64_t>> matrix_index_vs_truth = create_matrix(matrix_size);
     // std::vector<std::vector<uint64_t>> matrix_limited_ctruth = create_matrix(matrix_size);
     // std::vector<std::vector<uint64_t>> matrix_index_z = create_matrix(matrix_size);
 
     std::string matrix_unlimited_truth_vs_truth_filename = "matrix_unlimited_truth_vs_truth";
-    std::string matrix_ctruth_vs_truth_filename = "matrix_limited_truth";
-    std::string matrix_index_z_vs_truth_filename = "matrix_index";
-    std::string matrix_index_vs_index_z_filename = "matrix_unlimited_ctruth";
+    std::string matrix_ctruth_vs_truth_filename = "matrix_ctruth_vs_truth";
+    std::string matrix_index_z_vs_truth_filename = "matrix_index_z_vs_truth";
+    std::string matrix_index_vs_index_z_filename = "matrix_index_vs_index_z";
+    std::string matrix_matrix_index_vs_truth_filename = "matrix_index_vs_truth";
+
     // std::string matrix_limited_ctruth_filename = "matrix_limited_ctruth";
     // std::string matrix_index_z_filename = "matrix_index_z";
 
@@ -203,6 +206,7 @@ void queryLowMemory(
     remove(matrix_ctruth_vs_truth_filename.c_str());
     remove(matrix_index_z_vs_truth_filename.c_str());
     remove(matrix_index_vs_index_z_filename.c_str());
+    remove(matrix_matrix_index_vs_truth_filename.c_str());
     // remove(matrix_limited_ctruth_filename.c_str());
     // remove(matrix_index_z_filename.c_str());
 
@@ -210,6 +214,7 @@ void queryLowMemory(
     std::ofstream matrix_ctruth_vs_truth_file(matrix_ctruth_vs_truth_filename);
     std::ofstream matrix_index_z_vs_truth_file(matrix_index_z_vs_truth_filename);
     std::ofstream matrix_index_vs_index_z_file(matrix_index_vs_index_z_filename);
+    std::ofstream matrix_index_vs_truth_file(matrix_matrix_index_vs_truth_filename);
     // std::ofstream matrix_limited_ctruth_file(matrix_limited_ctruth_filename);
     // std::ofstream matrix_index_z_file(matrix_index_z_filename);
 
@@ -245,6 +250,7 @@ void queryLowMemory(
             matrix_ctruth_vs_truth[res_truth[j]][res_ctruth[j]] += 1;
             matrix_index_z_vs_truth[res_truth[j]][res_index_z[j]] += 1;
             matrix_index_vs_index_z[res_index_z[j]][res_index[j]] += 1;
+            matrix_index_vs_truth[res_truth[j]][res_index[j]] += 1;
             // matrix_limited_ctruth[res_limited_ctruth[j]][res_unlimited_ctruth[j]] += 1;
             // matrix_index_z[res_index_z[j]][res_unlimited_ctruth[j]] += 1;
 
@@ -260,6 +266,9 @@ void queryLowMemory(
                 }
                 if (res_index[j] > res_index_z[j]) {
                     matrix_index_vs_index_z_file << kmers[j] << " " << res_index[j] - res_index_z[j] << "\n";
+                }
+                if (res_index[j] > res_truth[j]) {
+                    matrix_index_vs_truth_file << kmers[j] << " " << res_index[j] - res_truth[j] << "\n";
                 }
                 // if (res_unlimited_ctruth[j] > res_limited_ctruth[j]) {
                 //     matrix_limited_ctruth_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_limited_ctruth[j] << "\n";
@@ -288,6 +297,11 @@ void queryLowMemory(
 
     std::cout << "matrix_index_vs_index_z" << std::endl;
     print_matrix(matrix_index_vs_index_z);
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "matrix_index_vs_truth" << std::endl;
+    print_matrix(matrix_index_vs_truth);
     std::cout << std::endl;
     std::cout << std::endl;
 
