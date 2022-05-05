@@ -1,5 +1,6 @@
 #pragma once
 #include <assert.h>
+#include <robin_hood.h>
 
 #include <algorithm>
 #include <deque>
@@ -85,6 +86,17 @@ inline int doQuery(const T& amqc, const std::string& kmer, bool canonical) {
     return amqc.get(kmer);
 }
 
+inline bool isInvalid(const std::string& sequence) {
+    int k = 5;
+    robin_hood::unordered_set<std::string> kmers;
+    int nb_kmers = sequence.size() - k + 1;
+    for (int start = 0; start < nb_kmers; start++) {
+        kmers.insert(sequence.substr(start, k));
+    }
+    float complexity = ((float)kmers.size()) / nb_kmers;
+    return complexity < 0.75;
+}
+
 // TODO even more tests
 // OPTIMIZE do min in place (expected gain: *2 speed ratio ?)
 /** // TODO redo description
@@ -98,11 +110,11 @@ inline int doQuery(const T& amqc, const std::string& kmer, bool canonical) {
  */
 template <typename T>
 inline std::vector<int> finderec(const T& amqc, const std::string& query, const unsigned int& K, const unsigned int& z, const bool& canonical) {
-//    if (query.length() < K) {
-//        //throw std::range_error("`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ")");
-//	std::cerr << "`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ") : " << query << std::endl;
-//return std::vector<int>();
-//    }
+    if (query.length() < K) {
+        // throw std::range_error("`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ")");
+        std::cerr << "`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ") : " << query << std::endl;
+        return std::vector<int>();
+    }
 
     const unsigned int k = K - z;
     unsigned long long size = query.size();
@@ -154,6 +166,14 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
         //     i++;
         // }
         // previous_answers.clear();  //optional
+    }
+
+    // correction of invalid kmers:
+    // OPTIMIZE: do not perform query instead of correcting it
+    for (int i = 0; i < response.size(); i++) {
+        if (isInvalid(query.substr(i, K))) {
+            response[i] = -1;
+        }
     }
 
     return response;

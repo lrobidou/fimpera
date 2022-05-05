@@ -246,35 +246,37 @@ void queryLowMemory(
         }
 
         for (std::size_t j = 0; j < res_unlimited_truth.size(); j++) {
-            matrix_unlimited_truth_vs_truth[res_truth[j]][res_unlimited_truth[j]] += 1;
-            matrix_ctruth_vs_truth[res_truth[j]][res_ctruth[j]] += 1;
-            matrix_index_z_vs_truth[res_truth[j]][res_index_z[j]] += 1;
-            matrix_index_vs_index_z[res_index_z[j]][res_index[j]] += 1;
-            matrix_index_vs_truth[res_truth[j]][res_index[j]] += 1;
-            // matrix_limited_ctruth[res_limited_ctruth[j]][res_unlimited_ctruth[j]] += 1;
-            // matrix_index_z[res_index_z[j]][res_unlimited_ctruth[j]] += 1;
+            if (res_truth[j] != -1) {
+                matrix_unlimited_truth_vs_truth[res_truth[j]][res_unlimited_truth[j]] += 1;
+                matrix_ctruth_vs_truth[res_truth[j]][res_ctruth[j]] += 1;
+                matrix_index_z_vs_truth[res_truth[j]][res_index_z[j]] += 1;
+                matrix_index_vs_index_z[res_index_z[j]][res_index[j]] += 1;
+                matrix_index_vs_truth[res_truth[j]][res_index[j]] += 1;
+                // matrix_limited_ctruth[res_limited_ctruth[j]][res_unlimited_ctruth[j]] += 1;
+                // matrix_index_z[res_index_z[j]][res_unlimited_ctruth[j]] += 1;
 
-            if (wrongKmersToAFile) {
-                if (res_unlimited_truth[j] > res_truth[j]) {
-                    matrix_unlimited_truth_vs_truth_file << kmers[j] << " " << res_unlimited_truth[j] - res_truth[j] << "\n";
+                if (wrongKmersToAFile) {
+                    if (res_unlimited_truth[j] > res_truth[j]) {
+                        matrix_unlimited_truth_vs_truth_file << kmers[j] << " " << res_unlimited_truth[j] - res_truth[j] << "\n";
+                    }
+                    if (res_ctruth[j] > res_truth[j]) {
+                        matrix_ctruth_vs_truth_file << kmers[j] << " " << res_ctruth[j] - res_truth[j] << "\n";
+                    }
+                    if (res_index_z[j] > res_truth[j]) {
+                        matrix_index_z_vs_truth_file << kmers[j] << " " << res_index_z[j] - res_truth[j] << "\n";
+                    }
+                    if (res_index[j] > res_index_z[j]) {
+                        matrix_index_vs_index_z_file << kmers[j] << " " << res_index[j] - res_index_z[j] << "\n";
+                    }
+                    if (res_index[j] > res_truth[j]) {
+                        matrix_index_vs_truth_file << kmers[j] << " " << res_index[j] - res_truth[j] << "\n";
+                    }
+                    // if (res_unlimited_ctruth[j] > res_limited_ctruth[j]) {
+                    //     matrix_limited_ctruth_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_limited_ctruth[j] << "\n";
+                    // }
+                    // if (res_unlimited_ctruth[j] > res_index_z[j]) {
+                    //     matrix_index_z_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_index_z[j] << "\n";
                 }
-                if (res_ctruth[j] > res_truth[j]) {
-                    matrix_ctruth_vs_truth_file << kmers[j] << " " << res_ctruth[j] - res_truth[j] << "\n";
-                }
-                if (res_index_z[j] > res_truth[j]) {
-                    matrix_index_z_vs_truth_file << kmers[j] << " " << res_index_z[j] - res_truth[j] << "\n";
-                }
-                if (res_index[j] > res_index_z[j]) {
-                    matrix_index_vs_index_z_file << kmers[j] << " " << res_index[j] - res_index_z[j] << "\n";
-                }
-                if (res_index[j] > res_truth[j]) {
-                    matrix_index_vs_truth_file << kmers[j] << " " << res_index[j] - res_truth[j] << "\n";
-                }
-                // if (res_unlimited_ctruth[j] > res_limited_ctruth[j]) {
-                //     matrix_limited_ctruth_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_limited_ctruth[j] << "\n";
-                // }
-                // if (res_unlimited_ctruth[j] > res_index_z[j]) {
-                //     matrix_index_z_file << kmers[j] << " " << res_unlimited_ctruth[j] - res_index_z[j] << "\n";
             }
         }
         i++;

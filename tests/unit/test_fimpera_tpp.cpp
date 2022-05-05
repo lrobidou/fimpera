@@ -123,7 +123,7 @@ TEST(fimpera_test_suite_fimpera, query) {
     f.query(fasta_filename, result_getter);
     std::vector<int> response = result_getter.getResult();
 
-    std::vector<int> expected = {1, 1, 1, 1, 0, 0, 1, 1, 1, 1};
+    std::vector<int> expected = {1, 1, 1, 1, 0, -1, 1, 1, 1, 1};
     EXPECT_EQ(response, expected);
 }
 
