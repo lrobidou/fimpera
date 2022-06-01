@@ -114,11 +114,4 @@ Pierre Peterlongo: pierre.peterlongo@inria.fr
 ## Work in progress
 
 `fimpera itself`
-- [ ] use uuid to decide whether the index is actually a `fimpera` index
-- [ ] read lowercase letters as uppercase letters when indexing genomic data
-- [ ] handle 'n' in canonical queries
-`documentation`
-- [ ] (re)write documentation for every function
-- [ ] write at least a README.md that explains the way the code is organized
-
-
+- [ ] use uuid to decide whether the index is actually a `fimpera` index ?
