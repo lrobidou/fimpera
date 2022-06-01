@@ -6,30 +6,22 @@
 
 #include "args.hpp"
 
-// Heavily assumes that the filter contains a CBF
 int main(int argc, char* argv[]) {
     argparse::ArgumentParser program("fimpera_index", "0.0.1");
     // mandatory arguments
-    program.add_argument("index_filename").help("index file you want to index");
+    program.add_argument("filename").help("file you want to index");
 
     parse(program, argc, argv);
 
-    const std::string index_filename = program.get("index_filename");
+    const std::string index_filename = program.get("filename");
 
-    // std::ifstream fin(input_filename, std::ios::out | std::ofstream::binary);
-
-    // const auto& [uuid, description, k, z, canonical, jsonString] = getMetadata(fin);
-    // std::cout << "Reading index " << input_filename << ":" << std::endl;
-    // std::cout << "    " << description << std::endl;
-    // std::cout << "    uuid: " << uuid << std::endl;
-    // std::cout << "    k: " << k << std::endl;
-    // std::cout << "    z: " << z << std::endl;
-    // if (jsonString.size() != 0) {
-    //     std::cout << jsonString << std::endl;
-    // }
-    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> f = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(index_filename, 35, 5, false, 1, 5);
-    UnlimitedTruthInTheShapeOfAnAMQ filter = f.getInnerFilter();
-    for (auto x : filter.getStats()) {
-        std::cout << x << " ";
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(index_filename, 35, 5, false, 1000, 5);
+    countingBF::CBF filter = f.getInnerFilter();
+    auto [filter_vector_stats, size] = filter.getStats();
+    std::cout << "abundance class; number of element of that class; total number of cells in the filter; percentage of cells allocated to that abundance" << std::endl;
+    std::size_t i = 0;
+    for (auto x : filter_vector_stats) {
+        std::cout << i << " " << x << " " << size << " " << (float)x / size << std::endl;
+        i++;
     }
 }
