@@ -20,6 +20,18 @@ inline std::tuple<std::mt19937, std::uniform_int_distribution<T>> rd(T min, T ma
     return {rng, uni};
 }
 
+template <typename T>
+inline T minElemInWindow(std::vector<T> vect, int iMin, int iMax) {
+    T minElem = vect[iMin];
+    for (int i = iMin; i < iMax; i++) {
+        T currentElem = vect[i];
+        if (currentElem < minElem) {
+            minElem = currentElem;
+        }
+    }
+    return minElem;
+}
+
 TEST(fimpera_test_suite_finderec, minElemInWindow) {
     std::vector<int> v = {
         0,    // 0
@@ -315,7 +327,7 @@ inline std::vector<int> sliding_window_minimum_2(const std::vector<int>& ARR, in
     return result;
 }
 
-TEST(fimpera_test_suite_finderec, test_sliding_window_minimum_naive) {
+TEST(fimpera_test_suite_finderec, test_comparisons_sliding_window_minimum) {
     /*
     goal of this test: test multiple approaches of an algorithm (sliding_window_minimuum).
     Three implementations:
