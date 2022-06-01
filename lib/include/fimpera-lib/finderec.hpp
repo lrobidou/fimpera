@@ -22,60 +22,57 @@ inline T minElemInWindow(std::vector<T> vect, int iMin, int iMax) {
 }
 
 // inspired by http://www.zrzahid.com/sliding-window-minmax/
-inline std::vector<int> sliding_window_minimum(const std::vector<int>& ARR, uint64_t w) {
-    std::vector<int> sliding_min = std::vector<int>(ARR.size() - w + 1);
-
+inline std::vector<int> sliding_window_minimum(std::vector<int>& ARR, uint64_t w) {
     if (ARR.size() < w) {
         return {};  // TODO erreur
     }
     if (w == 0) {
-        return ARR;  // TODO erreur plutot
+        return ARR;  // TODO erreur
     }
     if (w == 1) {
         return ARR;
     }
 
-    int min_left = ARR[0];
-    std::vector<int> min_right = std::vector<int>(w);
-
     uint64_t nbWin = ARR.size() / w;
+    int nb_elem_last_window = ARR.size() % w;
 
+    int min_left = ARR[0];
     for (uint64_t i = 0; i < w; i++) {
         min_left = std::min(min_left, ARR[i]);
     }
 
     for (uint64_t i = 0; i < nbWin - 1; i++) {
         int start_window = i * w;
-        min_right[w - 1] = ARR[start_window + w - 1];
         for (int indice = start_window + w - 2; indice >= start_window; indice--) {
-            min_right[indice - start_window] = std::min(min_right[indice - start_window + 1], ARR[indice]);
+            ARR[indice] = std::min(ARR[indice + 1], ARR[indice]);
         }
 
         for (uint64_t j = 0; j < w; j++) {
-            sliding_min[start_window + j] = std::min(min_right[j], min_left);
+            ARR[start_window + j] = std::min(ARR[start_window + j], min_left);
             min_left = (j == 0) ? ARR[start_window + w + j] : std::min(min_left, ARR[start_window + w + j]);
         }
     }
 
     // last window
-    int we_go_up_to = ARR.size() % w + 1;
 
     // compute min_right for last window
     int start_window = (nbWin - 1) * w;
-    min_right[w - 1] = ARR[start_window + w - 1];
     for (int indice = start_window + w - 2; indice >= start_window; indice--) {
-        min_right[indice - start_window] = std::min(min_right[indice - start_window + 1], ARR[indice]);
+        ARR[indice] = std::min(ARR[indice + 1], ARR[indice]);
     }
 
-    // compute the min for tha last window
-    for (int j = 0; j < we_go_up_to - 1; j++) {
-        sliding_min[start_window + j] = std::min(min_right[j], min_left);
+    // compute the min for the last window
+    for (int j = 0; j < nb_elem_last_window; j++) {
+        ARR[start_window + j] = std::min(ARR[start_window + j], min_left);
         min_left = (j == 0) ? ARR[start_window + w + j] : std::min(min_left, ARR[start_window + w + j]);
     }
 
-    sliding_min[start_window + we_go_up_to - 1] = std::min(min_right[we_go_up_to - 1], min_left);
+    ARR[start_window + nb_elem_last_window] = std::min(ARR[start_window + nb_elem_last_window], min_left);
+    for (std::size_t i = 0; i < w - 1; i++) {
+        ARR.pop_back();
+    }
 
-    return sliding_min;
+    return ARR;
 }
 
 template <typename T>
@@ -122,14 +119,14 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
     unsigned long long stretchLength = 0;  // number of consecutive positives kmers
     unsigned long long j = 0;              // index of the query vector
     bool extending_stretch = true;
-    int thisAnswer = 0;
+    int amq_answer = 0;
     std::vector<int> previous_answers;
     previous_answers.reserve(response.size());
     while (j < size - k + 1) {
         assert(stretchLength == previous_answers.size());
-        if ((thisAnswer = doQuery(amqc, query.substr(j, k), canonical))) {
+        if ((amq_answer = doQuery(amqc, query.substr(j, k), canonical))) {
             if (extending_stretch) {
-                previous_answers.push_back(thisAnswer);
+                previous_answers.push_back(amq_answer);
                 stretchLength++;
                 j++;
             } else {
@@ -137,7 +134,8 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
                 j = j - z;
             }
         } else {
-            if (stretchLength >= z) {
+            if (stretchLength > z) {
+                //
                 unsigned long long t = j - stretchLength;
                 for (const auto& minimum : sliding_window_minimum(previous_answers, z + 1)) {
                     response[t++] = minimum;
@@ -155,8 +153,8 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
         }
     }
     // Last values:
-    if (stretchLength >= z) {
-        std::vector<int> minimums = sliding_window_minimum(previous_answers, z + 1);
+    if (stretchLength > z) {
+        // std::vector<int> minimums = sliding_window_minimum(previous_answers, z + 1);
         unsigned long long t = size - k + 1 - stretchLength;
         for (const auto& minimum : sliding_window_minimum(previous_answers, z + 1)) {
             response[t++] = minimum;
@@ -170,7 +168,7 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
 
     // correction of invalid kmers:
     // OPTIMIZE: do not perform query instead of correcting it
-    for (int i = 0; i < response.size(); i++) {
+    for (std::size_t i = 0; i < response.size(); i++) {
         if (isInvalid(query.substr(i, K))) {
             response[i] = -1;
         }
