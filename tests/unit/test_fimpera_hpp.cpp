@@ -39,7 +39,7 @@ TEST(fimpera_test_suite_fimpera, getMetadatav0) {
     EXPECT_EQ(k, 32);
     EXPECT_EQ(z, 3);
     EXPECT_EQ(canonical, false);
-    EXPECT_EQ(jsonString, "");
+    EXPECT_EQ(jsonString, "{\"strategy\":\"identity\"}");
 }
 
 TEST(fimpera_test_suite_fimpera, getMetadata) {
@@ -53,7 +53,7 @@ TEST(fimpera_test_suite_fimpera, getMetadata) {
     EXPECT_EQ(k, 32);
     EXPECT_EQ(z, 3);
     EXPECT_EQ(canonical, false);
-    EXPECT_EQ(jsonString, "");
+    EXPECT_EQ(jsonString, "{\"strategy\":\"identity\"}");
 }
 
 TEST(fimpera_test_suite_fimpera, getMetadataWrongUUID) {

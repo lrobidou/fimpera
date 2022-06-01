@@ -19,3 +19,6 @@
 [submodule "thirdparty/json"]
 	path = thirdparty/json
 	url = https://github.com/nlohmann/json
+[submodule "thirdparty/argparse"]
+	path = thirdparty/argparse
+	url = https://github.com/p-ranav/argparse

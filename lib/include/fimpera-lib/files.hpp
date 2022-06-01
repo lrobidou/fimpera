@@ -41,7 +41,7 @@ inline void writeToFile<std::vector<bool>>(std::ofstream& fout, const std::vecto
 }
 
 template <typename T, typename... Args>
-void writeToFile(std::ofstream& fout, T t, Args... args) {
+inline void writeToFile(std::ofstream& fout, T t, Args... args) {
     writeToFile(fout, t);
     writeToFile(fout, args...);
 }

@@ -5,6 +5,23 @@
 
 template class fimpera<countingBF::CBF>;
 
+class ResultGetter : public CustomResponse {
+   private:
+    std::vector<int> entireResponse;
+
+   public:
+    ResultGetter() {}
+
+    void
+    processResult(const std::vector<int>& res, const unsigned int& K, const std::string& current_header, const std::string& current_read) {
+        entireResponse.insert(std::end(entireResponse), std::begin(res), std::end(res));
+    }
+
+    std::vector<int> getResult() {
+        return entireResponse;
+    }
+};
+
 TEST(fimpera_test_suite_fimpera, fimpera_creation) {
     fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>("../../tests/unit/data/1000LinesTest.txt", 35, 0, false, 10000, 5);  // random  size
 }
@@ -74,4 +91,88 @@ TEST(fimpera_test_suite_fimpera, fimpera_get_z_3) {
     const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
     fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 3, false, 10000, 5);  // random  size
     EXPECT_EQ(f.getz(), 3);
+}
+
+inline void printv(const std::vector<int>& x) {
+    for (auto y : x) {
+        std::cout << y << " ";
+    }
+    std::cout << std::endl;
+}
+
+TEST(fimpera_test_suite_fimpera, queryRead) {
+    const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
+    const std::string common0 = "AAACAGCGACGGAAGATAGCGTTGCTCCAGCAGTTG";
+    const std::string common1 = "AAACAGCGACTCTGAATATAGCGAATTTGATCACA";
+
+    const std::string read = common0 + common1;
+
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 3, false, 100000000, 5);  // size high enough to prevent false positives
+
+    std::vector<int> expected = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+    EXPECT_EQ(f.queryRead(read), expected);
+}
+
+TEST(fimpera_test_suite_fimpera, query) {
+    const std::string fasta_filename = "../../tests/unit/data/rnaseq_shortened.fasta";
+    const std::string kmc_filename = "../../tests/unit/data/rnaseq_shortened.txt";
+
+    ResultGetter result_getter = ResultGetter();
+
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(kmc_filename, 35, 3, false, 100000000, 5);  // size high enough to prevent false positives
+    f.query(fasta_filename, result_getter);
+    std::vector<int> response = result_getter.getResult();
+
+    std::vector<int> expected = {1, 1, 1, 1, 0, -1, 1, 1, 1, 1};
+    EXPECT_EQ(response, expected);
+}
+
+TEST(fimpera_test_suite_fimpera, testStrategyEqualityDefault) {
+    const std::string f1 = "../../tests/unit/data/index_1000LinesTest_identity_strategy_as_default.idx";
+    const std::string f2 = "../../tests/unit/data/test1000Lines.idx";
+
+    fimpera<countingBF::CBF> identityIdx = fimpera<countingBF::CBF>(f1);
+    fimpera<countingBF::CBF> noStrategyIdx = fimpera<countingBF::CBF>(f2);
+
+    EXPECT_EQ(identityIdx, noStrategyIdx);
+}
+
+TEST(fimpera_test_suite_fimpera, testStrategyEqualityChosen) {
+    const std::string f1 = "../../tests/unit/data/index_1000LinesTest_identity_strategy_chosen.idx";
+    const std::string f2 = "../../tests/unit/data/test1000Lines.idx";
+
+    fimpera<countingBF::CBF> identityIdx = fimpera<countingBF::CBF>(f1);
+    fimpera<countingBF::CBF> noStrategyIdx = fimpera<countingBF::CBF>(f2);
+
+    EXPECT_EQ(identityIdx, noStrategyIdx);
+}
+
+TEST(fimpera_test_suite_fimpera, testStrategyInequality) {
+    const std::string f1 = "../../tests/unit/data/index_1000LinesTest_log2_strategy.idx";
+    const std::string f2 = "../../tests/unit/data/test1000Lines.idx";
+
+    fimpera<countingBF::CBF> log2 = fimpera<countingBF::CBF>(f1);
+    fimpera<countingBF::CBF> noStrategyIdx = fimpera<countingBF::CBF>(f2);
+
+    EXPECT_FALSE(log2 == noStrategyIdx);
+}
+
+TEST(fimpera_test_suite_fimpera, testStrategyInequalitySameContentDifferentName) {
+    const std::string f1 = "../../tests/unit/data/index_1000LinesTest_identity_strategy_but_the_inner_name_is_called_log2.idx";
+    const std::string f2 = "../../tests/unit/data/test1000Lines.idx";
+
+    fimpera<countingBF::CBF> log2InName = fimpera<countingBF::CBF>(f1);
+    fimpera<countingBF::CBF> defaultIdx = fimpera<countingBF::CBF>(f2);
+
+    EXPECT_FALSE(log2InName == defaultIdx);
+}
+
+TEST(fimpera_test_suite_fimpera, testStrategyInequalitySameNameDifferentContent) {
+    const std::string f1 = "../../tests/unit/data/index_1000LinesTest_identity_strategy_but_the_inner_name_is_called_log2.idx";
+    const std::string f2 = "../../tests/unit/data/index_1000LinesTest_log2_strategy.idx";
+
+    fimpera<countingBF::CBF> identityIdx = fimpera<countingBF::CBF>(f1);
+    fimpera<countingBF::CBF> defaultIdx = fimpera<countingBF::CBF>(f2);
+
+    EXPECT_FALSE(identityIdx == defaultIdx);
 }

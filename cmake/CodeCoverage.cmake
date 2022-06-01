@@ -13,7 +13,7 @@ function(target_coverage target_name runners report_directory)
   message(STATUS "${BoldGreen}[coverage]${CEnd}: add target '${target_coverage}'")
   add_custom_target(${target_name}
     COMMAND ${runners}
-    COMMAND ${LCOV_BIN} --directory . --capture --output-file ${report_directory}.info
+    COMMAND ${LCOV_BIN} --directory ../.. --capture --output-file ${report_directory}.info
     COMMAND ${LCOV_BIN} --remove ${report_directory}.info '*/tests/*' '*/thirdparty/*' '*/app/*' '/usr*' --output-file ${report_directory}.info.filtered
     COMMAND ${GENHTML_BIN} -o ${report_directory} ${report_directory}.info.filtered
     COMMAND ${LCOV_BIN} --list ${report_directory}.info.filtered

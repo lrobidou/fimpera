@@ -37,3 +37,4 @@
 *.idx
 lcov.info
 .vscode
+/bin/
