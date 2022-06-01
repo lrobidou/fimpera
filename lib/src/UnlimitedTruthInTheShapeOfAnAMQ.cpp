@@ -35,11 +35,11 @@ bool UnlimitedTruthInTheShapeOfAnAMQ::set(const std::string& x, int occurrence) 
     return data;
 }
 
-std::vector<std::size_t> UnlimitedTruthInTheShapeOfAnAMQ::getStats() const {
+std::tuple<std::vector<std::size_t>, std::size_t> UnlimitedTruthInTheShapeOfAnAMQ::getStats() const {
     std::vector<std::size_t> v(_limitValueInBucket + 1, 0);
 
     for (const auto& [key, value] : _t) {
         v[value] += 1;
     }
-    return v;
+    return {v, _nbCells};
 }

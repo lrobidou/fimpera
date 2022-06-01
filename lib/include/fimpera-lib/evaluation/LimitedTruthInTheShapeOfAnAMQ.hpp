@@ -14,5 +14,5 @@ class LimitedTruthInTheShapeOfAnAMQ {
 
     bool set(const std::string& x, int occurrence = 1);
     int get(const std::string& x) const;
-    std::vector<std::size_t> getStats() const;
+    std::tuple<std::vector<std::size_t>, std::size_t> getStats() const;
 };

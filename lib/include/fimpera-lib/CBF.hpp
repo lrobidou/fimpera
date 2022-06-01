@@ -31,7 +31,7 @@ class CBF {
     void dump(std::ofstream& fout) const;
     bool operator==(const CBF& that) const;
 
-    std::vector<std::size_t> getStats() const;
+    std::tuple<std::vector<std::size_t>, std::size_t> getStats() const;
     ~CBF();
 };
 

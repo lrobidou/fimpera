@@ -142,13 +142,13 @@ bool CBF::operator==(const CBF& that) const {
 }
 
 // returns a vector such that vector[i] = len([x for x in filter if x == i])
-std::vector<std::size_t> CBF::getStats() const {
+std::tuple<std::vector<std::size_t>, std::size_t> CBF::getStats() const {
     std::vector<std::size_t> v(_limitValueInBucket + 1, 0);
 
     for (std::size_t i = 0; i < _nbCells; i++) {
         v[get(i)] += 1;
     }
-    return v;
+    return {v, _nbCells};
 }
 
 CBF::~CBF() {}

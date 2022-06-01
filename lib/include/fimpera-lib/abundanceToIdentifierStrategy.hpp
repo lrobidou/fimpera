@@ -19,4 +19,10 @@ class log2 {
     static std::string name();
 };
 
+class log1_5 {
+   public:
+    static uint64_t fct(const uint64_t& abundance);
+    static std::string name();
+};
+
 }  // namespace abundanceToIdentifierStrategy

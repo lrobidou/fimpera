@@ -175,10 +175,7 @@ fimpera<T>::fimpera(const std::string& filename) {
 
 template <typename T>
 void fimpera<T>::query(const std::string& filename, CustomResponse& response) const {
-    if (!fileExists(filename)) {
-        std::string msg = "The file " + filename + " does not exist.";
-        throw std::runtime_error(msg);
-    }
+    checkExists(filename);
     for (const auto& [read, header] : fimpera_lib::generators::ReadReader(filename)) {
         std::vector<int> res = finderec(_filter, read, _k + _z, _z, _canonical);
         response.processResult(res, _k + _z, header, read);
