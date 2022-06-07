@@ -59,7 +59,7 @@ cd fimpera
 ```
 
 
-## Usage on genomic data (fastq or fasta file)
+### Usage on genomic data (fastq or fasta file)
 After installing `fimpera`, you can test it using test samples data file.
 
 Index a simple KMC output file, using 100000 bits, kmer of size 35, 5 encoding bits in the counting bloom filter and z=3.
