@@ -69,7 +69,7 @@ TEST(fimpera_test_suite_files, fimpera_save) {
     EXPECT_TRUE(f2 == f3);
 }
 
-TEST(fimpera_test_suite_fimpera, fimpera_get_canonical) {
+TEST(fimpera_test_suite_fimpera, fimpera_get_cannical) {
     const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
     fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 0, false, 10000, 5);  // random  size
     EXPECT_EQ(f.getCanonical(), false);
@@ -100,7 +100,7 @@ inline void printv(const std::vector<int>& x) {
     std::cout << std::endl;
 }
 
-TEST(fimpera_test_suite_fimpera, queryRead) {
+TEST(fimpera_test_suite_fimpera, queryRead_z3) {
     const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
     const std::string common0 = "AAACAGCGACGGAAGATAGCGTTGCTCCAGCAGTTG";
     const std::string common1 = "AAACAGCGACTCTGAATATAGCGAATTTGATCACA";
@@ -110,6 +110,60 @@ TEST(fimpera_test_suite_fimpera, queryRead) {
     fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 3, false, 100000000, 5);  // size high enough to prevent false positives
 
     std::vector<int> expected = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+    EXPECT_EQ(f.queryRead(read), expected);
+}
+
+TEST(fimpera_test_suite_fimpera, queryRead_z0) {
+    const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
+    const std::string common0 = "AAACAGCGACGGAAGATAGCGTTGCTCCAGCAGTTG";
+    const std::string common1 = "AAACAGCGACTCTGAATATAGCGAATTTGATCACA";
+
+    const std::string read = common0 + common1;
+
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 0, false, 100000000, 5);  // size high enough to prevent false positives
+
+    std::vector<int> expected = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+    EXPECT_EQ(f.queryRead(read), expected);
+}
+
+TEST(fimpera_test_suite_fimpera, queryRead_canonical_not_required) {
+    // use canonical parameter on not canonical input => should do nothing
+    const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
+    const std::string common0 = "AAACAGCGACGGAAGATAGCGTTGCTCCAGCAGTTG";
+    const std::string common1 = "AAACAGCGACTCTGAATATAGCGAATTTGATCACA";
+
+    const std::string read = common0 + common1;
+
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 3, true, 100000000, 5);  // size high enough to prevent false positives
+
+    std::vector<int> expected = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+    EXPECT_EQ(f.queryRead(read), expected);
+}
+
+TEST(fimpera_test_suite_fimpera, queryRead_canonical) {
+    const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
+    const std::string common0 = "CAACTGCTGGAGCAACGCTATCTTCCGTCGCTGTTT";
+    const std::string common1 = "AAACAGCGACTCTGAATATAGCGAATTTGATCACA";
+
+    const std::string read = common0 + common1;
+
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 3, true, 100000000, 5);  // size high enough to prevent false positives
+
+    std::vector<int> expected = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+    EXPECT_EQ(f.queryRead(read), expected);
+}
+
+TEST(fimpera_test_suite_fimpera, queryRead_wrongly_canonical) {
+    // we query the canonical but we ask no canonical
+    const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
+    const std::string common0 = "CAACTGCTGGAGCAACGCTATCTTCCGTCGCTGTTT";
+    const std::string common1 = "AAACAGCGACTCTGAATATAGCGAATTTGATCACA";
+
+    const std::string read = common0 + common1;
+
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 3, false, 100000000, 5);  // size high enough to prevent false positives
+
+    std::vector<int> expected = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
     EXPECT_EQ(f.queryRead(read), expected);
 }
 
