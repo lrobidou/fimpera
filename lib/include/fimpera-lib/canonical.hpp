@@ -6,15 +6,39 @@
 #include <string>
 
 inline char complement(char n) {
+    // breaks are unnecessary
+    // but they may prevent bugs if someone tries to modify the code
     switch (n) {
         case 'A':
             return 'T';
+            break;
         case 'T':
             return 'A';
+            break;
         case 'G':
             return 'C';
+            break;
         case 'C':
             return 'G';
+            break;
+        case 'a':
+            return 't';
+            break;
+        case 't':
+            return 'a';
+            break;
+        case 'g':
+            return 'c';
+            break;
+        case 'c':
+            return 'g';
+            break;
+        case 'N':
+            return 'N';
+            break;
+        case 'n':
+            return 'n';
+            break;
     }
     assert(false);
     return ' ';

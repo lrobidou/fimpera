@@ -1,5 +1,5 @@
 # What is this 'paper' branch ?
-This 'paper' branch is a way to guarentee that reviewers have access to the specific version of fimpera we used to obtain the paper's results. We may (or may not) change the output format of scripts after the paper submission in the main branch, but this 'paper' branch is garenteed to stay correct wrt the result in the paper.
+This 'paper' branch is a guarantee that reviewers have access to the specific version of fimpera we used to obtain the paper's results. We may (or may not) change the output format of scripts after the paper submission in the main branch, but this 'paper' branch is garenteed to stay correct wrt the result in the paper.
 
 Note: each time you checkout to another branch (="change branch"), you **must** run
 ```bash

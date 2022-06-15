@@ -18,7 +18,7 @@ class InvalidKmerFilter {
     bool _first;
     // a vector of kmer presence.
     // Basically like a counting Bloom filter,
-    // but with a size chosen to get rid of FP.
+    // but with a size chosen high enough to get rid of FP.
     // index of this vector is _kmerBin
     std::vector<uint8_t> _kmers;
     // the value of the small kmer we are counting to estimate the complexity
