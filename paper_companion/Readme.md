@@ -19,6 +19,11 @@ chmod +x install.sh
 ```
 `fimpera` requires Cmake >= 3.13.0 and a compiler supporting **version 17 or higher** of c++ standard. For instance, g++ 11.3.1 works fine, but version above 7 should be fine as well (see https://gcc.gnu.org/projects/cxx-status.html#cxx17 for more details).
 
+## Data
+The two tara ocean sequencing datasets are 
+ * Indexed: reads from ERR1726642 https://www.ebi.ac.uk/ena/browser/view/ERR1726642
+ * Queried: 10^5 reads from ERR4691696: https://www.ebi.ac.uk/ena/browser/view/ERR4691696
+
 ## Running
 `fimpera` consists of 2 main executables, placed in the bin folder (`fimpera_index` and `fimpera_query`). We provide another executable to reproduce the paper results. To check the output of fimpera, we compare it to a hashtable. Hashtables are very sapce-consuming and should not be used in production. Binary using them are thus placed in another folder to discourage users from using them.
 
