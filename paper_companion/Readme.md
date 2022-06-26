@@ -28,18 +28,30 @@ The two tara ocean sequencing datasets are
 `fimpera` consists of 2 main executables, placed in the bin folder (`fimpera_index` and `fimpera_query`). We provide another executable to reproduce the paper results. To check the output of fimpera, we compare it to a hashtable. Hashtables are very sapce-consuming and should not be used in production. Binary using them are thus placed in another folder to discourage users from using them.
 
 The executable used in the paper is `fimpera_truth_id_diff`. It prints matrixes to the standard output. Run it and redirect the output to a file to get a log of fimpera's queries results.
+```
+./build/app/fimpera_truth_id_diff query.fastq kmc_output_file.txt {size of the filter} {number of bits per abundance} -K {value of k} {z_values} > fimpera.log
+```
+Note: it may prints warnings on stderr (stderr is likely your console if you use most terminals). This is perfectly fine, it just informs you that that a read was too short to contains any k-mers, hence it was ignored.
 
-Note that the z values must be provided in the sources via the constant `zs` in the source file `app/src/truth_identifier_diff.cpp`, e.g. 
-```c++
-const std::vector<int> zs = {0, 5, 7};
+The matrixes are as folows:
 ```
-If you change the z values, recompile before running (`./install.sh`)
+    |   x x x x x x
+ y  |   x x x x x x
+    |   x x x x x x
+    |   x x x x x x
+    |   x x x x x x
+    |
+    |-------------->
+    v       x
+ x: index (without fimpera)
+    or
+    ctruth (constructed fp+ construction overestimation)
+    or
+    index z (with fimpera)
+ y: ground truth
+ ```
 
-Then run:
-```
-./build/app/fimpera_truth_id_diff query.fastq kmc_output_file.txt {size of the filter} {number of bits per abundance} -K {value of k} > fimepra.log
-```
-Note: it may prints warnings on stderr (stderr is likely to be your console if you use most terminals). This is fine, it just informs you that that a read was too short to conatins any k-mers, hence it was ignored.
+looking at `matrix[x][y]` allows you to answer "when the ground truth is y, how many time was the answer {without fimpera / with fimpera} x ?" 
 
 
 Once you have a log, you must then splits the log with regard to the z value.
@@ -47,7 +59,7 @@ Keep the log file to the root folder of fimpera before running the next script:
 ```bash
 python scripts/matrix_divider.py fimpera.log
 ```
-This will create one file per z value, named {z}.txt. Each file contains a reponse of fimepra. Each line repsesents a correct abundance, and each number on that line represents the reported abundance by fimpera. We call those intermediate representations `abundance matrixes`.
+This will create one file per z value, named {z}.txt. Each file contains a reponse of fimepra for one z. Each line repsesents a correct abundance, and each number on that line represents the reported abundance by fimpera. We call those intermediate representations `abundance matrixes`.
 
 Do not move {z}.txt files before running the next script.
 
