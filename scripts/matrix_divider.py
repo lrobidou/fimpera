@@ -22,14 +22,26 @@ Lines that can be ignored are marked as [ignored]. Note that it can be multiple 
 
 def get_new_z_if_any(line):
     """Tries to return the value of z contained in the line. Returns false if no value of z is found."""
-    match line.strip().split():
-        case "starting", "analyzing", "z", "=", new_z, "after", _, "s.":
-            return new_z
+    # match line.strip().split():
+    if line.startswith("starting analyzing"):
+        line = line.split()
+
+        new_z = line[4]
+        print(new_z)
+        return new_z
+        # case "starting", "analyzing", "z", "=", new_z, "after", _, "s.":
+        # return new_z
     return False
 
 
-def this_line_is_the_start_of_a_matrix(line):
+def this_line_is_the_start_of_a_z_matrix(line):
     if line.strip() == "matrix_index_z_vs_truth":
+        return True
+    return False
+
+
+def this_line_is_the_start_of_a_construction_matrix(line):
+    if line.strip() == "matrix_ctruth_vs_truth":
         return True
     return False
 
@@ -50,7 +62,7 @@ def is_vector(line):
     return True
 
 
-def split_matrixes(filename):
+def split_z_matrixes(filename):
     z = 0
     copy_in_file = False
     with open(filename, "r") as fichier:
@@ -66,7 +78,27 @@ def split_matrixes(filename):
             new_z = get_new_z_if_any(ligne)
             if new_z != False:
                 z = new_z
-            if this_line_is_the_start_of_a_matrix(ligne):
+            if this_line_is_the_start_of_a_z_matrix(ligne):
+                copy_in_file = True
+
+
+def split_construction_matrixes(filename):
+    z = 0
+    copy_in_file = False
+    with open(filename, "r") as fichier:
+        while ligne := fichier.readline():
+            if copy_in_file:
+                with open(f"{z}_construction.txt", "w") as outfile:
+                    if is_vector(ligne):
+                        outfile.write(ligne)
+                    while (ligne := fichier.readline()) and (
+                        copy_in_file := is_vector(ligne)
+                    ):
+                        outfile.write(ligne)
+            new_z = get_new_z_if_any(ligne)
+            if new_z != False:
+                z = new_z
+            if this_line_is_the_start_of_a_construction_matrix(ligne):
                 copy_in_file = True
 
 
@@ -78,7 +110,8 @@ def main():
     args = parser.parse_args()
 
     filename = args.filename
-    split_matrixes(filename)
+    split_z_matrixes(filename)
+    split_construction_matrixes(filename)
 
 
 if __name__ == "__main__":
