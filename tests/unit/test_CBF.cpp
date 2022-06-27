@@ -112,8 +112,8 @@ TEST(fimpera_test_suite_CBF, fpr_1_hash_4) {
     double fpr = (double)pos / (double)(pos + neg);
     EXPECT_EQ(pos + neg, nbElemnTest);
     // in theory, FPR is about 0.00118
-    EXPECT_GE(fpr, 0.00116);
-    EXPECT_LE(fpr, 0.00120);
+    EXPECT_GE(fpr, 0.00096);
+    EXPECT_LE(fpr, 0.0014);
 }
 
 TEST(fimpera_test_suite_CBF, fpr_1_hash_15) {
@@ -141,7 +141,7 @@ TEST(fimpera_test_suite_CBF, fpr_1_hash_15) {
     EXPECT_EQ(pos + neg, nbElemnTest);
     // in theory, FPR is about 8.832775369727666e-05
     EXPECT_GE(fpr, 0);
-    EXPECT_LE(fpr, 0.0001);
+    EXPECT_LE(fpr, 0.00012);
 }
 
 TEST(fimpera_test_suite_CBF, fpr_n_hash_1) {
@@ -193,6 +193,6 @@ TEST(fimpera_test_suite_CBF, fpr_n_hash_4) {
     }
     double fpr = (double)pos / (double)(pos + neg);
     EXPECT_EQ(pos + neg, nbElemnTest);
-    EXPECT_GE(fpr, 0.00114);
-    EXPECT_LE(fpr, 0.00122);
+    EXPECT_GE(fpr, 0.00112);
+    EXPECT_LE(fpr, 0.00124);
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <robin_hood.h>
 
+#include <vector>
 #include <string>
 
 class UnlimitedTruthInTheShapeOfAnAMQ {
