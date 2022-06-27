@@ -141,7 +141,7 @@ TEST(fimpera_test_suite_CBF, fpr_1_hash_15) {
     EXPECT_EQ(pos + neg, nbElemnTest);
     // in theory, FPR is about 8.832775369727666e-05
     EXPECT_GE(fpr, 0);
-    EXPECT_LE(fpr, 0.0001);
+    EXPECT_LE(fpr, 0.00012);
 }
 
 TEST(fimpera_test_suite_CBF, fpr_n_hash_1) {
