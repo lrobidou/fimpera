@@ -38,3 +38,5 @@
 lcov.info
 .vscode
 /bin/
+/results/
+/expes/
