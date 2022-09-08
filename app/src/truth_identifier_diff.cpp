@@ -330,28 +330,47 @@ inline std::string ReplaceAll(std::string str, const std::string& from, const st
 }
 
 template <typename Strategy>
-void compareWithTruth(const std::string& KMCFilename, const std::string& queryFile, uint64_t size, std::size_t K, int b, Strategy strategy, bool wrongKmersToAFile) {
+void compareWithTruth(const std::string& queryFile, uint64_t size, std::size_t K, int b, Strategy strategy, bool wrongKmersToAFile) {
     const std::vector<int> zs = {5};
     auto start = std::chrono::steady_clock::now();
 
-    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, 0, false, size, b);
-    fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_truth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, 0, false, size, b);
-    fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(strategy, KMCFilename, K, 0, false, size, b);
+    const std::string kmc_truth = "31_kmerlist.txt";
+
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_truth, K, 0, false, size, b);
+    fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_truth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_truth, K, 0, false, size, b);
+    fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(strategy, kmc_truth, K, 0, false, size, b);
     std::cout << "index truth in (ms)=" << since(start).count() << std::endl;
 
-    for (int z : zs) {
+    // s_abundance, z = 5, k=31
+    {
+        const std::string& KMCFilename = "31_kmerlist.txt";
+        int z = 6;
         auto start_of_this_z = std::chrono::steady_clock::now();
         std::cout << "starting analyzing z = " << z << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
         fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, z, false, size, b);
         fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, z, false, size, b);
         fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, K, z, false, size, b);
 
-        // std::string indexFilename = ReplaceAll(indexFilenameTemplate, "_z_", "_z" + std::to_string(z) + "_");
-        // indexFilename = ReplaceAll(indexFilename, "_k_", "_k" + std::to_string(K) + "_");
-        // std::cout << "index filename " << indexFilename << std::endl;
+        queryLowMemory(unlimited_truth, limited_truth, index, unlimited_ctruth, limited_ctruth, index_z, queryFile, b, wrongKmersToAFile);
+    }
 
-        // fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(indexFilename);
-        // std::cout << "index BF in (ms)=" << since(start_of_this_z).count() << std::endl;
+    // s_abundance, z = 0, k=25
+    // then move z to 6
+    {
+        const std::string& KMCFilename = "25_kmerlist.txt";
+
+        int z = 0;
+        int future_z_incc = 6;
+        auto start_of_this_z = std::chrono::steady_clock::now();
+        std::cout << "starting analyzing z = " << z << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
+        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, z, false, size, b);
+        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, z, false, size, b);
+
+        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, K - future_z_incc, z, false, size, b);
+
+        unlimited_ctruth.increase_z_of(6);
+        limited_ctruth.increase_z_of(6);
+        index_z.increase_z_of(6);
 
         queryLowMemory(unlimited_truth, limited_truth, index, unlimited_ctruth, limited_ctruth, index_z, queryFile, b, wrongKmersToAFile);
     }
@@ -362,7 +381,7 @@ int main(int argc, char* argv[]) {
     // mandatory arguments
     // program.add_argument("input_filename").help("index you want to query");
     program.add_argument("query_filename").help("file you want to query against the index");
-    program.add_argument("kmc_filename").help("kmc file that contains the truth for the Kmers");
+    // program.add_argument("kmc_filename").help("kmc file that contains the truth for the Kmers");
     program.add_argument("size").help("output index size").scan<'i', std::size_t>();
 
     program.add_argument("-K").help("size of Kmers").default_value(31).scan<'i', int>();
@@ -374,7 +393,7 @@ int main(int argc, char* argv[]) {
 
     // const std::string index_filename = program.get("input_filename");
     const std::string query_filename = program.get("query_filename");
-    const std::string kmc_filename = program.get("kmc_filename");
+    // const std::string kmc_filename = program.get("kmc_filename");
     const std::size_t size = program.get<std::size_t>("size");
     const int b = program.get<int>("b");
     const int K = program.get<int>("-K");
@@ -384,5 +403,5 @@ int main(int argc, char* argv[]) {
     // abundanceToIdentifierStrategy::identity idStrategy = abundanceToIdentifierStrategy::identity();
     abundanceToIdentifierStrategy::log2 logStrategy = abundanceToIdentifierStrategy::log2();
 
-    compareWithTruth(kmc_filename, query_filename, size, K, b, logStrategy, wrongKmersToAFile);
+    compareWithTruth(query_filename, size, K, b, logStrategy, wrongKmersToAFile);
 }
