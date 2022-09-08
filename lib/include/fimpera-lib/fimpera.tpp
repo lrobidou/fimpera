@@ -77,7 +77,10 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
         std::getline(linestream, Kmer, '\t');
         std::getline(linestream, abundanceStr, '\t');
 
-        // assert(Kmer.length() == K);//TODO check that the file actually contains kmer (or smer)
+        if (Kmer.length() != K)  // TODO check that the file actually contains kmer (or smer)
+        {
+            exit(1);
+        }
         unsigned long long size = Kmer.size();
         unsigned long long j = 0;  // start of the kmer in the Kmer
 
@@ -202,6 +205,12 @@ void fimpera<T>::save(const std::string& filename) const {
     fout.flush();
     // close
     fout.close();
+}
+
+template <typename T>
+void fimpera<T>::increase_z_of(const unsigned int z_incc) {
+    this->_z += z_incc;
+    // this->_k += z_incc;
 }
 
 template <typename T>
