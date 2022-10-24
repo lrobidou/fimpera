@@ -93,9 +93,9 @@ void writeConstructionFPToFile(const fimpera<countingBF::CBF>& index, const std:
     while (!(current_read = reader.get_next_read()).empty()) {
         std::size_t size = current_read.length();
         std::size_t j = 0;  // start of the kmer in the Kmer
-        while (j < size - (index.getK() - index.getz()) + 1) {
+        while (j < size - (index.get_k() - index.get_z()) + 1) {
             if (construction_truth_response[pos] && !truth_response[pos]) {
-                outFile << current_read.substr(j, index.getK() - index.getz()) << "\n";
+                outFile << current_read.substr(j, index.get_k() - index.get_z()) << "\n";
             }
             pos++;
             j++;
@@ -186,7 +186,7 @@ void compareWithTruth(const std::string& indexFilenameTemplate, const std::strin
         fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(indexFilename);
         std::cout << "index BF in (ms)=" << since(start_of_this_z).count() << std::endl;
 
-        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, K, index.getz(), false, size, nbBuckets);
+        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, K, index.get_z(), false, size, nbBuckets);
         std::cout << "index ctruth in (ms)=" << since(start_of_this_z).count() << std::endl;
 
         queryLowMemory(index, truth, ctruth, queryFile);

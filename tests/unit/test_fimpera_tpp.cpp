@@ -78,19 +78,19 @@ TEST(fimpera_test_suite_fimpera, fimpera_get_canonical) {
 TEST(fimpera_test_suite_fimpera, fimpera_get_K) {
     const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
     fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 0, false, 10000, 5);  // random  size
-    EXPECT_EQ(f.getK(), 35);
+    EXPECT_EQ(f.get_k(), 35);
 }
 
 TEST(fimpera_test_suite_fimpera, fimpera_get_z_0) {
     const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
     fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 0, false, 10000, 5);  // random  size
-    EXPECT_EQ(f.getz(), 0);
+    EXPECT_EQ(f.get_z(), 0);
 }
 
 TEST(fimpera_test_suite_fimpera, fimpera_get_z_3) {
     const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
     fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 3, false, 10000, 5);  // random  size
-    EXPECT_EQ(f.getz(), 3);
+    EXPECT_EQ(f.get_z(), 3);
 }
 
 inline void printv(const std::vector<int>& x) {
@@ -175,4 +175,36 @@ TEST(fimpera_test_suite_fimpera, testStrategyInequalitySameNameDifferentContent)
     fimpera<countingBF::CBF> defaultIdx = fimpera<countingBF::CBF>(f2);
 
     EXPECT_FALSE(identityIdx == defaultIdx);
+}
+
+TEST(fimpera_test_suite_fimpera, increase_z) {
+    const std::string filename = "../../tests/unit/data/test1000Lines.idx";
+
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename);
+
+    EXPECT_EQ(f.get_k(), 35);
+
+    f.increase_z_of(5);
+
+    EXPECT_EQ(f.get_k(), 40);
+}
+
+TEST(fimpera_test_suite_fimpera, increase_z_and_query) {
+    const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
+    const std::string common0 = "AAACAGCGACGGAAGATAGCGTTGCTCCAGCAGTTG";
+    const std::string common1 = "AAACAGCGACTCTGAATATAGCGAATTTGATCACA";
+
+    const std::string read = common0 + common1;
+
+    fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 3, false, 100000000, 5);  // size high enough to prevent false positives
+
+    std::vector<int> expected = {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+    EXPECT_EQ(f.queryRead(read), expected);
+
+    f.increase_z_of(1);
+
+    std::vector<int> expected_after_z_increase = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    EXPECT_EQ(f.queryRead(read), expected_after_z_increase);
+
+    // EXPECT_FALSE(identityIdx == defaultIdx);
 }

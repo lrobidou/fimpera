@@ -236,7 +236,7 @@ void queryLowMemory(
         std::vector<int> res_ctruth = limited_ctruth.queryRead(current_read);
         std::vector<int> res_index_z = index_z.queryRead(current_read);
 
-        int k = limited_truth.getK();
+        int k = limited_truth.get_k();
 
         std::vector<std::string> kmers = std::vector<std::string>();
         kmers.reserve(current_read.size() - k + 1);

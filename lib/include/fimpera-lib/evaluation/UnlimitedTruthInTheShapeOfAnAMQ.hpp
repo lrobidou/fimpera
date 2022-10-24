@@ -1,8 +1,8 @@
 #pragma once
 #include <robin_hood.h>
 
-#include < vector>
 #include <string>
+#include <vector>
 
 class UnlimitedTruthInTheShapeOfAnAMQ {
    protected:
