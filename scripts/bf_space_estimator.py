@@ -31,6 +31,13 @@ def main():
         type=str,
         help="the name of the file containing the Kmers",
     )
+    parser.add_argument(
+        "--script",
+        type=bool,
+        help="use if only the space using ine hash function is needed. Useful is called from a script.",
+        default=False,
+        required=False
+    )
     args = parser.parse_args()
 
     epsilon = args.epsilon  # in 0->1
@@ -38,14 +45,18 @@ def main():
 
     n = get_nb_lines_of(filename)
     mopti = int(-(n * log(epsilon)) / (log(2) ** 2))
-    print("optimal number of hash function, epsilon =", epsilon, "number of Kmers =", n)
-    print("space in bits :", mopti)
+    m1 = int(1 / (1 - (1 - epsilon) ** (1 / n)))
+    if args.script:
+        print(m1)
+    else:
+        print("optimal number of hash function, epsilon =", epsilon, "number of Kmers =", n)
+        print("space in bits :", mopti)
 
-    print()
+        print()
 
-    m1 = 1 / (1 - (1 - epsilon) ** (1 / n))
-    print("1 hash function, epsilon =", epsilon, "number of Kmers =", n)
-    print("space in bits :", int(m1))
+        
+        print("1 hash function, epsilon =", epsilon, "number of Kmers =", n)
+        print("space in bits :", m1)
 
 
 if __name__ == "__main__":
