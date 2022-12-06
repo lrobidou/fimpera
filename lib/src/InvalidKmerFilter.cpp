@@ -62,7 +62,7 @@ void InvalidKmerFilter::_addKmerBinToKmersVectAndUpdateNumberOfDistinctKmers(con
     }
 }
 
-InvalidKmerFilter::InvalidKmerFilter(int k) : _kmerBin(0), _first(true), _kmers(32768, 0), _smallk(5), _k(k), _distinctKmers(0) {
+InvalidKmerFilter::InvalidKmerFilter(int k) : _kmerBin(0), _first(true), _kmers(32769, 0), _smallk(5), _k(k), _distinctKmers(0) {
     _kmerBinMask = 1;
     _kmerBinMask <<= (3 * 5);
     _kmerBinMask -= 1;

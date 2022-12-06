@@ -29,6 +29,13 @@ Computes a matrix such that
     index z
  2: unlimited truth
 */
+inline void printv(const std::vector<int>& x) {
+    for (int k = 0; k < x.size(); k++) {
+        std::cout << x[k] << " ";
+    }
+    std::cout << std::endl;
+}
+
 inline void add(robin_hood::unordered_map<int, int>& map, const int& key, const int& valueToAdd) {
     robin_hood::unordered_map<int, int>::const_iterator got = map.find(key);
     if (got != map.end()) {                   // found
@@ -57,6 +64,39 @@ inline void push(robin_hood::unordered_map<int, std::vector<int>>& map, const in
 inline int absDiff(const int& a, const int& b) {
     int abs_diff = (a > b) ? (a - b) : (b - a);
     return abs_diff;
+}
+
+/// Represents the exception for taking the median of an empty list
+class median_of_empty_list_exception : public std::exception {
+    virtual const char* what() const throw() {
+        return "Attempt to take the median of an empty list of numbers.  "
+               "The median of an empty list is undefined.";
+    }
+};
+
+/// Return the median of a sequence of numbers defined by the random
+/// access iterators begin and end.  The sequence must not be empty
+///(median is undefined for an empty set).
+///
+/// The numbers must be convertible to double.
+template <class RandAccessIter>
+double median(RandAccessIter begin, RandAccessIter end) {
+    if (begin == end) {
+        throw median_of_empty_list_exception();
+    }
+    std::size_t size = end - begin;
+    std::size_t middleIdx = size / 2;
+    RandAccessIter target = begin + middleIdx;
+    std::nth_element(begin, target, end);
+
+    if (size % 2 != 0) {  // Odd number of elements
+        return *target;
+    } else {  // Even number of elements
+        double a = *target;
+        RandAccessIter targetNeighbor = target - 1;
+        std::nth_element(begin, targetNeighbor, end);
+        return (a + *targetNeighbor) / 2.0;
+    }
 }
 
 inline robin_hood::unordered_map<int, int> getHistogram(std::vector<int> a, std::vector<int> b) {
@@ -183,7 +223,7 @@ void queryLowMemory(
     const int& b,
     bool wrongKmersToAFile) {
     // std::size_t matrix_size = pow(2, b);
-    std::size_t matrix_size = 50;  // TODO?
+    std::size_t matrix_size = 20;  // TODO?
 
     std::vector<std::vector<uint64_t>> matrix_unlimited_truth_vs_truth = create_matrix(matrix_size);
     std::vector<std::vector<uint64_t>> matrix_ctruth_vs_truth = create_matrix(matrix_size);
@@ -320,97 +360,168 @@ void queryLowMemory(
     // print(matrix);
 }
 
-inline std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
-    size_t start_pos = 0;
-    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length();  // Handles case where 'to' is a substring of 'from'
+template <typename Strategy>
+void compareSmersAndKmers_in_UnlimitedTruthInTheShapeOfAnAMQ(const std::string& kmc_filename_kmers, const std::string& kmc_filename_smers, std::size_t size, int b, Strategy strategy) {
+    bool _canonical = true;
+    auto start = std::chrono::steady_clock::now();
+
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_truth_k = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_filename_kmers, 31, 3, false, size, b);  // on stocke des 28-mers
+
+    std::cout << "31" << std::endl;
+
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_truth_s = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_filename_smers, 28, 0, false, size, b);  // on stocke des 28-mers
+    std::cout << "28" << std::endl;
+
+    checkExists(kmc_filename_smers);
+
+    std::ifstream myFileGz(kmc_filename_smers);
+    zstr::istream myFile(myFileGz);
+
+    std::string line;
+    while (std::getline(myFile, line)) {  // \n are removed
+        std::string smer;
+        std::string abundanceStr;
+        std::stringstream linestream(line);
+        std::getline(linestream, smer, '\t');
+        std::getline(linestream, abundanceStr, '\t');
+
+        if (smer.size() != 28) {
+            std::cerr << "smer.size() != 28" << std::endl;
+        }
+
+        try {
+            uint64_t abundance = std::stoll(abundanceStr);
+            uint64_t id = strategy.fct(abundance);
+            if (_canonical) {
+                smer = toCanonical(smer);
+            }
+
+            const std::vector<int> kmers = unlimited_truth_k.querySmers(smer);
+            const std::vector<int> smers = unlimited_truth_s.querySmers(smer);
+
+            if (kmers.size() != 1) {
+                std::cerr << "kmers.size() != 1" << std::endl;
+            }
+            if (smers.size() != 1) {
+                std::cerr << "smers.size() != 1" << std::endl;
+            }
+
+            std::cout << kmers[0] << " " << smers[0] << std::endl;
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "Invalid argument when parsing line :\"" << line << "\"" << std::endl;
+        }
     }
-    return str;
+}
+
+// remove values <0 from v
+std::vector<int> filter(const std::vector<int>& v) {
+    std::vector<int> f;  // filtered
+    f.reserve(v.size());
+    for (const auto& x : v) {
+        if (x >= 0) {
+            f.push_back(x);
+        }
+    }
+    return f;
 }
 
 template <typename Strategy>
-void compareWithTruth(const std::string& queryFile, uint64_t size, std::size_t K, int b, Strategy strategy, bool wrongKmersToAFile) {
-    const std::vector<int> zs = {5};
+void compareSmersAndKmers_in_cBF(const std::string& kmc_filename_kmers, const std::string& kmc_filename_smers, std::size_t size, int b, Strategy strategy, const std::string& filename_query) {
+    bool _canonical = true;
     auto start = std::chrono::steady_clock::now();
 
-    const std::string kmc_truth = "/scratch/lrobidou/AHX_ACXIOSF_k31_canon.txt";
-    //std::cout << "ok_0" << std::endl;
+    fimpera<countingBF::CBF> cbf_k = fimpera<countingBF::CBF>(strategy, kmc_filename_kmers, 31, 2, true, size, b);  // on stocke des 29-mers
 
-    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_truth, K, 0, true, size, b);
-    //std::cout << "ok_1" << std::endl;
-    fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_truth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_truth, K, 0, true, size, b);
-    fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(strategy, kmc_truth, K, 0, true, size, b);
-    //std::cout << "index truth in (ms)=" << since(start).count() << std::endl;
+    fimpera<countingBF::CBF> cbf_s = fimpera<countingBF::CBF>(strategy, kmc_filename_smers, 29, 0, true, size, b);  // on stocke des 29-mers
 
-    // z = 0
-    {
-        const std::string& KMCFilename = "/scratch/lrobidou/AHX_ACXIOSF_k31_canon.txt";
-        auto start_of_this_z = std::chrono::steady_clock::now();
-        std::cout << "starting analyzing z = " << 0 << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
-        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 0, true, size, b);
-        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 0, true, size, b);
-        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, 31, 0, true, size, b);
-        queryLowMemory(unlimited_truth, limited_truth, index, unlimited_ctruth, limited_ctruth, index_z, queryFile, b, wrongKmersToAFile);
+    checkExists(kmc_filename_smers);
+    checkExists(filename_query);
+
+    std::ifstream myFileGz(kmc_filename_smers);
+    zstr::istream myFile(myFileGz);
+
+    std::string line;
+    //while (std::getline(myFile, line)) {  // \n are removed
+    //    std::string smer;
+    //    std::string abundanceStr;
+    //    std::stringstream linestream(line);
+    //    std::getline(linestream, smer, '\t');
+    //    std::getline(linestream, abundanceStr, '\t');
+
+    //    if (smer.size() != 29) {
+    //        std::cerr << "smer.size() != 29" << std::endl;
+    //    }
+
+    //    try {
+    //        uint64_t abundance = std::stoll(abundanceStr);
+    //        uint64_t id = strategy.fct(abundance);
+    //        if (_canonical) {
+    //            smer = toCanonical(smer);
+    //        }
+
+    //        const std::vector<int> kmers = cbf_k.querySmers(smer);
+    //        const std::vector<int> smers = cbf_s.querySmers(smer);
+
+    //        if (kmers.size() != 1) {
+    //            std::cerr << "kmers.size() != 1" << std::endl;
+    //        }
+    //        if (smers.size() != 1) {
+    //            std::cerr << "smers.size() != 1" << std::endl;
+    //        }
+
+    //        // std::cout << smer << " " << kmers[0] << " " << smers[0] << std::endl;
+    //    } catch (const std::invalid_argument& e) {
+    //        std::cerr << "Invalid argument when parsing line :\"" << line << "\"" << std::endl;
+    //    }
+    //}
+    checkExists(filename_query);
+std::cout << "before matrix" << std::endl;
+    cbf_s.increase_z_of(2);
+    std::vector<std::vector<uint64_t>> mat_median = create_matrix(256);
+    for (const auto& [read, header] : fimpera_lib::generators::ReadReader(filename_query)) {
+        
+        std::vector<int> rk_no_filter = cbf_k.queryRead(read);
+        std::vector<int> rs_no_filter = cbf_s.queryRead(read);
+        std::vector<int> rk = filter(rk_no_filter);
+        std::vector<int> rs = filter(rs_no_filter);
+
+        if ((rk.size() != 0) && (rs.size() != 0)) {
+          if (rk.size() != rs.size()) {std::cerr << "rk.size() != rs.size()" << std::endl;}
+            int mk = median(rk.begin(), rk.end());
+            int ms = median(rs.begin(), rs.end());
+            if (mk > ms) {
+                std::cout << "mk > ms\n";
+                printv(rk);
+                printv(rs);
+                printv(cbf_k.querySmers(read));
+                printv(cbf_s.querySmers(read));
+           }
+
+            mat_median[mk][ms] += 1;
+}
     }
-
-    // s_abundance, z = 3, k=31
-
-    {
-        const std::string& KMCFilename = "/scratch/lrobidou/AHX_ACXIOSF_k31_canon.txt";
-        auto start_of_this_z = std::chrono::steady_clock::now();
-        std::cout << "starting analyzing z = " << 3 << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
-        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 3, true, size, b);
-        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 3, true, size, b);
-        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, 31, 3, true, size, b);
-        queryLowMemory(unlimited_truth, limited_truth, index, unlimited_ctruth, limited_ctruth, index_z, queryFile, b, wrongKmersToAFile);
-    }
-
-    // s_abundance, z = 0, k=25
-    // then move z to 3
-    {
-        const std::string& KMCFilename = "/scratch/lrobidou/AHX_ACXIOSF_k28_canon.txt";
-        auto start_of_this_z = std::chrono::steady_clock::now();
-        std::cout << "starting analyzing z = " << 10 << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
-        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 28, 0, true, size, b);
-        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 28, 0, true, size, b);
-
-        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, 28, 0, true, size, b);
-
-        unlimited_ctruth.increase_z_of(3);
-        limited_ctruth.increase_z_of(3);
-        index_z.increase_z_of(3);
-
-        queryLowMemory(unlimited_truth, limited_truth, index, unlimited_ctruth, limited_ctruth, index_z, queryFile, b, wrongKmersToAFile);
-    }
+    std::cout << "matrix" << std::endl;
+    print_matrix(mat_median);
 }
 
 int main(int argc, char* argv[]) {
     argparse::ArgumentParser program("fimpera_index", "0.0.1");
     // mandatory arguments
     // program.add_argument("input_filename").help("index you want to query");
-    program.add_argument("query_filename").help("file you want to query against the index");
-    // program.add_argument("kmc_filename").help("kmc file that contains the truth for the Kmers");
+    program.add_argument("kmc_filename_kmers").help("file you want to query against the index");
+    program.add_argument("kmc_filename_smers").help("file you want to query against the index");
+    program.add_argument("filename_query").help("query file");
     program.add_argument("size").help("output index size").scan<'i', std::size_t>();
-
-    program.add_argument("-K").help("size of Kmers").default_value(31).scan<'i', int>();
-    // program.add_argument("-z").help("value of z (cf paper of findere)").default_value(3).scan<'i', int>();
     program.add_argument("b").help("the number of bits per buckets in the filter").scan<'i', int>();
-    program.add_argument("--file").help("should kmers answered wrongly be printed to file").default_value(false).implicit_value(true);
 
     parse(program, argc, argv);
 
-    // const std::string index_filename = program.get("input_filename");
-    const std::string query_filename = program.get("query_filename");
-    // const std::string kmc_filename = program.get("kmc_filename");
+    const std::string kmc_filename_kmers = program.get("kmc_filename_kmers");
+    const std::string kmc_filename_smers = program.get("kmc_filename_smers");
     const std::size_t size = program.get<std::size_t>("size");
     const int b = program.get<int>("b");
-    const int K = program.get<int>("-K");
-    bool wrongKmersToAFile = program.get<bool>("--file");
-    std::cout << "wrongKmersToAFile : " << wrongKmersToAFile << std::endl;
-    // const int z = program.get<int>("-z");
+    const std::string filename_query = program.get("filename_query");
     abundanceToIdentifierStrategy::identity idStrategy = abundanceToIdentifierStrategy::identity();
-    // abundanceToIdentifierStrategy::log2 logStrategy = abundanceToIdentifierStrategy::log2();
 
-    compareWithTruth(query_filename, size, K, b, idStrategy, wrongKmersToAFile);
+    compareSmersAndKmers_in_cBF(kmc_filename_kmers, kmc_filename_smers, size, b, idStrategy, filename_query);
 }

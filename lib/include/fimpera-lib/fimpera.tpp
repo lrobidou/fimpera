@@ -22,7 +22,7 @@ fimpera<T>::fimpera(const std::string& filename, const unsigned int& k, const un
     assert(k >= z);
     checkExists(filename);
     this->_strategy = "identity";
-    // std::cout << "in fimpera constructor " << nbBits << std::endl; // TODO: remove
+    std::cout << "in fimpera constructor " << nbBits << std::endl; // TODO: remove
     std::ifstream myFileGz(filename);
     zstr::istream myFile(myFileGz);
 
@@ -62,9 +62,10 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
     this->_strategy = strategyWrapper.name();
     // this->_strategy = "log2";
 
-    // std::cout << "in fimpera constructor " << nbBits << std::endl; // TODO: remove
+    std::cout << "in fimpera constructor2 " << nbBits << std::endl; // TODO: remove
     std::ifstream myFileGz(filename);
     zstr::istream myFile(myFileGz);
+   std::cout << "coucou" << std::endl;
 
     std::string line;
 
@@ -77,6 +78,7 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
 
         if (kmer.length() != k)  // TODO check that the file actually contains kmer (or smer)
         {
+            std::cout << Kmer << " " << Kmer.length() << " " << K << std::endl;
             exit(1);
         }
         unsigned long long j = 0;  // start of the kmer in the Kmer
@@ -93,7 +95,7 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
                 j++;
             }
         } catch (const std::invalid_argument& e) {
-            std::cerr << "Invalid argument when parsing line :\"" << line << "\"" << std::endl;
+            std::cout << "Invalid argument when parsing line :\"" << line << "\"" << std::endl;
         }
     }
 }
@@ -105,7 +107,7 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
     checkExists(filename);
     this->_strategy = strategyWrapper.name();
 
-    // std::cout << "in fimpera constructor " << nbBits << std::endl; // TODO: remove
+    std::cout << "in fimpera constructor3 " << nbBits << std::endl; // TODO: remove
     std::ifstream myFileGz(filename);
     zstr::istream myFile(myFileGz);
 

@@ -48,3 +48,7 @@ target_link_libraries(fimpera_stats_filter ${LIBRARY_NAME} ${APP_LINK} z)
 add_executable(fimpera_ctruth_abundance_histogram ${APP_SOURCE_DIR}/ctruth_abundance_histogram.cpp)
 add_dependencies(fimpera_ctruth_abundance_histogram ${APP_DEPENDENCIES})
 target_link_libraries(fimpera_ctruth_abundance_histogram ${LIBRARY_NAME} ${APP_LINK} z)
+
+add_executable(fimpera_smers_comparison ${APP_SOURCE_DIR}/smers_comparison.cpp)
+add_dependencies(fimpera_smers_comparison ${APP_DEPENDENCIES})
+target_link_libraries(fimpera_smers_comparison ${LIBRARY_NAME} ${APP_LINK} z)
