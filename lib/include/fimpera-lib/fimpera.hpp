@@ -19,14 +19,15 @@ class fimpera {
     std::string _strategy;
 
    public:
-    fimpera(const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets = 1);
+    fimpera(const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets = 1, const unsigned int& nbHash = 1);
     template <typename U>
-    fimpera(const U& strategyWrapper, const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits);
+    fimpera(const U& strategyWrapper, const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits, const unsigned int& nbHash = 1);
     template <typename U>
-    fimpera(const U& strategyWrapper, const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets);
+    fimpera(const U& strategyWrapper, const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets, const unsigned int& nbHash = 1);
     fimpera(const std::string& filename);
     void query(const std::string& filename, CustomResponse& response) const;
     std::vector<int> queryRead(const std::string& read) const;
+    std::vector<int> querySmers(const std::string& read) const;
     void save(const std::string& filename) const;
     void increase_z_of(const unsigned int z_incc);
     const T& getInnerFilter() const;

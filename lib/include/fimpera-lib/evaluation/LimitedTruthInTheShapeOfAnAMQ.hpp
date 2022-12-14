@@ -10,7 +10,7 @@ class LimitedTruthInTheShapeOfAnAMQ {
     robin_hood::unordered_map<std::string, int> _t;
 
    public:
-    LimitedTruthInTheShapeOfAnAMQ(int nbBits, int nbBuckets);
+    LimitedTruthInTheShapeOfAnAMQ(int nbBits, int nbBuckets, int nbHash);
 
     bool set(const std::string& x, int occurrence = 1);
     int get(const std::string& x) const;

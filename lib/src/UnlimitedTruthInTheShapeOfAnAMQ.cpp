@@ -12,7 +12,7 @@ int UnlimitedTruthInTheShapeOfAnAMQ::get(const std::string& x) const {
     }
 }
 
-UnlimitedTruthInTheShapeOfAnAMQ::UnlimitedTruthInTheShapeOfAnAMQ(int nbBits, int nbBuckets) : _nbBuckets(nbBuckets) {
+UnlimitedTruthInTheShapeOfAnAMQ::UnlimitedTruthInTheShapeOfAnAMQ(int nbBits, int nbBuckets, int nbHash) : _nbBuckets(nbBuckets) {
     _nbCells = nbBits / _nbBuckets;
     _limitValueInBucket = pow(2, _nbBuckets) - 1;  // OPTIMIZE ?
 }

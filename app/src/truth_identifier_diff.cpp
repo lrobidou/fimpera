@@ -337,10 +337,10 @@ void compareWithTruth(const std::string& queryFile, uint64_t size, std::size_t K
     const std::string kmc_truth = "/scratch/lrobidou/AHX_ACXIOSF_k31_canon.txt";
     //std::cout << "ok_0" << std::endl;
 
-    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_truth, K, 0, true, size, b);
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_truth, K, 0, true, size, b, 1);
     //std::cout << "ok_1" << std::endl;
-    fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_truth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_truth, K, 0, true, size, b);
-    fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(strategy, kmc_truth, K, 0, true, size, b);
+    fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_truth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_truth, K, 0, true, size, b, 1);
+    fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(strategy, kmc_truth, K, 0, true, size, b, 1);
     //std::cout << "index truth in (ms)=" << since(start).count() << std::endl;
 
     // z = 0
@@ -348,9 +348,9 @@ void compareWithTruth(const std::string& queryFile, uint64_t size, std::size_t K
         const std::string& KMCFilename = "/scratch/lrobidou/AHX_ACXIOSF_k31_canon.txt";
         auto start_of_this_z = std::chrono::steady_clock::now();
         std::cout << "starting analyzing z = " << 0 << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
-        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 0, true, size, b);
-        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 0, true, size, b);
-        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, 31, 0, true, size, b);
+        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 0, true, size, b, 1);
+        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 0, true, size, b, 1);
+        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, 31, 0, true, size, b, 1);
         queryLowMemory(unlimited_truth, limited_truth, index, unlimited_ctruth, limited_ctruth, index_z, queryFile, b, wrongKmersToAFile);
     }
 
@@ -360,9 +360,9 @@ void compareWithTruth(const std::string& queryFile, uint64_t size, std::size_t K
         const std::string& KMCFilename = "/scratch/lrobidou/AHX_ACXIOSF_k31_canon.txt";
         auto start_of_this_z = std::chrono::steady_clock::now();
         std::cout << "starting analyzing z = " << 3 << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
-        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 3, true, size, b);
-        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 3, true, size, b);
-        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, 31, 3, true, size, b);
+        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 3, true, size, b, 1);
+        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 31, 3, true, size, b, 1);
+        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, 31, 3, true, size, b, 1);
         queryLowMemory(unlimited_truth, limited_truth, index, unlimited_ctruth, limited_ctruth, index_z, queryFile, b, wrongKmersToAFile);
     }
 
@@ -372,10 +372,10 @@ void compareWithTruth(const std::string& queryFile, uint64_t size, std::size_t K
         const std::string& KMCFilename = "/scratch/lrobidou/AHX_ACXIOSF_k28_canon.txt";
         auto start_of_this_z = std::chrono::steady_clock::now();
         std::cout << "starting analyzing z = " << 10 << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
-        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 28, 0, true, size, b);
-        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 28, 0, true, size, b);
+        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 28, 0, true, size, b, 1);
+        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, 28, 0, true, size, b, 1);
 
-        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, 28, 0, true, size, b);
+        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, 28, 0, true, size, b, 1);
 
         unlimited_ctruth.increase_z_of(3);
         limited_ctruth.increase_z_of(3);

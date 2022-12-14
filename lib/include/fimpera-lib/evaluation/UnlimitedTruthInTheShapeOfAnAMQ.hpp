@@ -12,7 +12,7 @@ class UnlimitedTruthInTheShapeOfAnAMQ {
     robin_hood::unordered_map<std::string, int> _t;
 
    public:
-    UnlimitedTruthInTheShapeOfAnAMQ(int nbBits, int nbBuckets);
+    UnlimitedTruthInTheShapeOfAnAMQ(int nbBits, int nbBuckets, int nbHash);
 
     bool set(const std::string& x, int occurrence = 1);
     int get(const std::string& x) const;

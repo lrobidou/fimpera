@@ -55,7 +55,7 @@ int LimitedTruthInTheShapeOfAnAMQ::get(const std::string& x) const {
     }
 }
 
-LimitedTruthInTheShapeOfAnAMQ::LimitedTruthInTheShapeOfAnAMQ(int nbBits, int nbBuckets) : _nbBuckets(nbBuckets) {
+LimitedTruthInTheShapeOfAnAMQ::LimitedTruthInTheShapeOfAnAMQ(int nbBits, int nbBuckets, int nbHash) : _nbBuckets(nbBuckets) {
     _nbCells = nbBits / _nbBuckets;
     _limitValueInBucket = pow(2, _nbBuckets) - 1;  // OPTIMIZE ?
 }

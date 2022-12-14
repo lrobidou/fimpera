@@ -111,10 +111,10 @@ inline bool isInvalid(const std::string& sequence) {
  */
 template <typename T>
 inline std::vector<int> finderec(const T& amqc, const std::string& query, const unsigned int& K, const unsigned int& z, const bool& canonical, const bool& filtration = true, const bool& uppercase = true) {
-    std::cout << "finderec z=" << z << "k=" << K << "\n";
+    // std::cout << "finderec z=" << z << "k=" << K << "\n";
     if (query.length() < K) {
         // throw std::range_error("`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ")");
-        std::cerr << "`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ") : " << query << std::endl;
+        // std::cerr << "`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ") : " << query << std::endl;
         return std::vector<int>();
     }
 

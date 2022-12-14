@@ -18,11 +18,10 @@ inline void checkExists(const std::string& filename) {
 }
 
 template <typename T>
-fimpera<T>::fimpera(const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets) : _filter(nbBits, nbBuckets), _canonical(canonical), _s(k - z), _z(z) {
+fimpera<T>::fimpera(const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets, const unsigned int& nbHash) : _filter(nbBits, nbBuckets, nbHash), _canonical(canonical), _s(k - z), _z(z) {
     assert(k >= z);
     checkExists(filename);
     this->_strategy = "identity";
-    std::cout << "in fimpera constructor " << nbBits << std::endl; // TODO: remove
     std::ifstream myFileGz(filename);
     zstr::istream myFile(myFileGz);
 
@@ -56,7 +55,7 @@ fimpera<T>::fimpera(const std::string& filename, const unsigned int& k, const un
 
 template <typename T>
 template <typename U>
-fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets) : _filter(nbBits, nbBuckets), _canonical(canonical), _s(k - z), _z(z) {
+fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets, const unsigned int& nbHash) : _filter(nbBits, nbBuckets, nbHash), _canonical(canonical), _s(k - z), _z(z) {
     assert(k >= z);
     checkExists(filename);
     this->_strategy = strategyWrapper.name();
@@ -65,11 +64,12 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
     std::cout << "in fimpera constructor2 " << nbBits << std::endl; // TODO: remove
     std::ifstream myFileGz(filename);
     zstr::istream myFile(myFileGz);
-   std::cout << "coucou" << std::endl;
+   std::cout << "indexing " << filename << " with k = " << k << " and z = " << z << std::endl;
 
     std::string line;
 
     while (std::getline(myFile, line)) {  // \n are removed
+//std::cout << line << "\n";
         std::string kmer;
         std::string abundanceStr;
         std::stringstream linestream(line);
@@ -78,7 +78,7 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
 
         if (kmer.length() != k)  // TODO check that the file actually contains kmer (or smer)
         {
-            std::cout << Kmer << " " << Kmer.length() << " " << K << std::endl;
+            std::cout << kmer << " " << kmer.length() << " " << k << std::endl;
             exit(1);
         }
         unsigned long long j = 0;  // start of the kmer in the Kmer
@@ -86,7 +86,10 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
         try {
             uint64_t abundance = std::stoll(abundanceStr);
             uint64_t id = strategyWrapper.fct(abundance);
+//std::cout << kmer << " " << abundance << " " << id << "\n";
+//std::cout << "j= " << std::endl;
             while (j + _s < k + 1) {
+//std::cout << j << " ";
                 std::string smer = kmer.substr(j, _s);
                 if (_canonical) {
                     smer = toCanonical(smer);
@@ -94,15 +97,17 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
                 _filter.set(smer, id);
                 j++;
             }
+//std::cout << "\n";
         } catch (const std::invalid_argument& e) {
             std::cout << "Invalid argument when parsing line :\"" << line << "\"" << std::endl;
         }
     }
+    std::cout << "fin constructeur" << std::endl;
 }
 
 template <typename T>
 template <typename U>
-fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits) : _filter(nbBits, 1), _canonical(canonical), _s(k - z), _z(z) {
+fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const unsigned int& k, const unsigned int& z, bool canonical, uint64_t nbBits, const unsigned int& nbHash) : _filter(nbBits, 1, nbHash), _canonical(canonical), _s(k - z), _z(z) {
     assert(k >= z);
     checkExists(filename);
     this->_strategy = strategyWrapper.name();
@@ -185,6 +190,25 @@ void fimpera<T>::query(const std::string& filename, CustomResponse& response) co
 template <typename T>
 std::vector<int> fimpera<T>::queryRead(const std::string& read) const {
     return finderec(_filter, read, _s + _z, _z, _canonical);
+}
+
+template <typename T>
+std::vector<int> fimpera<T>::querySmers(const std::string& read) const {
+    std::cout << read << "\n";
+    std::string uppercase_query(read);
+
+    std::transform(uppercase_query.begin(),
+                   uppercase_query.end(),
+                   uppercase_query.begin(),
+                   [](unsigned char c) { return std::toupper(c); });
+
+    unsigned long long size = uppercase_query.size();
+    std::vector<int> response(size - _s + 1, 0);
+    for (size_t i = 0; i < response.size(); i++) {
+        response[i] = _filter.get(toCanonical(read.substr(i, _s)));
+        std::cout << read.substr(i, _s) << " " << response[i] << "\n";
+    }
+    return response;
 }
 
 template <typename T>
