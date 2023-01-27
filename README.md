@@ -103,15 +103,11 @@ Pierre Peterlongo: pierre.peterlongo@inria.fr
 
 <!-- TODO -->
 
+# Using fimpera by grouping abundances as their log2 values
 
+[This](https://github.com/lrobidou/fimpera/blob/master/lib/include/fimpera-lib/abundanceToIdentifierStrategy.hpp) file contains definition of multiple surjective functions that links abundances to their values. Those functions are implemented [here](https://github.com/lrobidou/fimpera/blob/master/lib/src/abundanceToIdentifierStrategy.cpp). To implement you own surjective function, first define a new class that exposes two public functions: `static uint64_t fct(const uint64_t& abundance)`, the surjective function which takes an abundance as a parameter, and give it a name with `static std::string name()`. You must then pass an instantiation of that class as the first parameter of the `fimpera` constructructor. 
 
 
 
 <!-- ## Reproduce paper results -->
 <!-- TODO -->
-
-
-## Work in progress
-
-`fimpera itself`
-- [ ] use uuid to decide whether the index is actually a `fimpera` index ?
