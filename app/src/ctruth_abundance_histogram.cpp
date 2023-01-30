@@ -78,10 +78,9 @@ std::tuple<int, int, int, int> compareVectors(const std::vector<std::vector<int>
     return {tp, tn, fp, fn};
 }
 
-void compareWithTruth(const std::string& KMCFilename, const std::string& queryFile, int K, int z) {
-    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, K, 0, false, 0, 1000);
-    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> constrution_truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, K, z, false, 0, 1000);
-    std::cout << "yay" << std::endl;
+void compareWithTruth(const std::string& KMCFilename, const std::string& queryFile, int k, int z) {
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, k, 0, false, 0, 1000);
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> constrution_truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, k, z, false, 0, 1000);
 
     // create objects to get the result of the queries back (but one could chose to process each read independently instead)
     ResultGetter result_getter_truth = ResultGetter();
@@ -112,15 +111,15 @@ int main(int argc, char* argv[]) {
     // program.add_argument("input_filename").help("index you want to query");
     program.add_argument("kmc_filename").help("kmc file that contains the truth for the Kmers");
     program.add_argument("query_filename").help("file you want to query against the index");
-    program.add_argument("K").help("value of k").scan<'i', int>();
+    program.add_argument("k").help("value of k").scan<'i', int>();
     program.add_argument("z").help("value of z").scan<'i', int>();
 
     parse(program, argc, argv);
 
     const std::string query_filename = program.get("query_filename");
     const std::string kmc_filename = program.get("kmc_filename");
-    const int K = program.get<int>("K");
+    const int k = program.get<int>("k");
     const int z = program.get<int>("z");
 
-    compareWithTruth(kmc_filename, query_filename, K, z);
+    compareWithTruth(kmc_filename, query_filename, k, z);
 }

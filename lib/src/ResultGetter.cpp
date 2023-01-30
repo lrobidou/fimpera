@@ -3,14 +3,14 @@
 
 ResultGetter::ResultGetter() {}
 
-void ResultGetter::processResult(const std::vector<int>& res, const unsigned int& K, const std::string& current_header, const std::string& current_read) {
+void ResultGetter::processResult(const std::vector<int>& res, const unsigned int& k, const std::string& current_header, const std::string& current_read) {
     entireResponse.push_back(res);
     std::vector<std::string> kmers;
     std::size_t j = 0;
     std::size_t size = current_read.size();
 
-    while (j < size - K + 1) {
-        kmers.push_back(current_read.substr(j, K));
+    while (j < size - k + 1) {
+        kmers.push_back(current_read.substr(j, k));
         j++;
     }
     if (kmers.size() != res.size()) {

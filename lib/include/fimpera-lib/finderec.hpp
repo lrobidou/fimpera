@@ -102,7 +102,7 @@ inline bool isInvalid(const std::string& sequence) {
  * @brief Query using "counting findere".
  * @param filterOrTruth the amq wrapped within a customAMQ
  * @param s the sequence to be queried
- * @param K the value for (big) k
+ * @param k the value for (big) k
  * @param z the current position being queried in s
  * @param canonical should kmers be queried in their canonical form ?
  * @param filtration should low complexity kmers be skipped ?
@@ -110,10 +110,10 @@ inline bool isInvalid(const std::string& sequence) {
  * @return The result of fimpera's query on s. Low complexity kmers are answered as -1.
  */
 template <typename T>
-inline std::vector<int> finderec(const T& amqc, const std::string& query, const unsigned int& K, const unsigned int& z, const bool& canonical, const bool& filtration = true, const bool& uppercase = true) {
-    if (query.length() < K) {
-        // throw std::range_error("`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ")");
-        std::cerr << "`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ") : " << query << std::endl;
+inline std::vector<int> finderec(const T& amqc, const std::string& query, const unsigned int& k, const unsigned int& z, const bool& canonical, const bool& filtration = true, const bool& uppercase = true) {
+    if (query.length() < k) {
+        // throw std::range_error("`query.length()` (which is " + std::to_string(query.length()) + ") < `k` (which is " + std::to_string(k) + ")");
+        std::cerr << "`query.length()` (which is " + std::to_string(query.length()) + ") < `k` (which is " + std::to_string(k) + ") : " << query << std::endl;
         return std::vector<int>();
     }
 
@@ -125,18 +125,18 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
                        [](unsigned char c) { return std::toupper(c); });
     }
 
-    const unsigned int k = K - z;
+    const unsigned int s = k - z;
     unsigned long long size = uppercase_query.size();
-    std::vector<int> response(size - K + 1, 0);
+    std::vector<int> response(size - k + 1, 0);
     unsigned long long stretchLength = 0;  // number of consecutive positives kmers
     unsigned long long j = 0;              // index of the query vector
     bool extending_stretch = true;
     int amq_answer = 0;
     std::vector<int> previous_answers;
     previous_answers.reserve(response.size());
-    while (j < size - k + 1) {
+    while (j < size - s + 1) {
         assert(stretchLength == previous_answers.size());
-        if ((amq_answer = doQuery(amqc, uppercase_query.substr(j, k), canonical))) {
+        if ((amq_answer = doQuery(amqc, uppercase_query.substr(j, s), canonical))) {
             if (extending_stretch) {
                 previous_answers.push_back(amq_answer);
                 stretchLength++;
@@ -160,7 +160,7 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
     }
     // Last values:
     if (stretchLength > z) {
-        unsigned long long t = size - k + 1 - stretchLength;
+        unsigned long long t = size - s + 1 - stretchLength;
         for (const auto& minimum : sliding_window_minimum(previous_answers, z + 1)) {
             response[t++] = minimum;
         }
@@ -170,7 +170,7 @@ inline std::vector<int> finderec(const T& amqc, const std::string& query, const 
         // correction of invalid kmers:
         // OPTIMIZE: do not perform query instead of correcting it
         for (std::size_t i = 0; i < response.size(); i++) {
-            if (isInvalid(uppercase_query.substr(i, K))) {
+            if (isInvalid(uppercase_query.substr(i, k))) {
                 response[i] = -1;
             }
         }

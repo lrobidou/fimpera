@@ -6,8 +6,8 @@
 #include <random>
 
 inline void printv(const std::vector<int>& x, int i, int j) {
-    for (int k = i; k < j; k++) {
-        std::cout << x[k] << " ";
+    for (int s = i; s < j; s++) {
+        std::cout << x[s] << " ";
     }
     std::cout << std::endl;
 }
@@ -55,15 +55,15 @@ TEST(fimpera_test_suite_finderec, minElemInWindow) {
 }
 
 // TEST(fimpera_test_suite_finderec, range_error) {
-//     int K = 31;
+//     int k = 31;
 //     int z = 0;
 //     std::string query = "ACT";
 //     std::vector<int> expected = {};
 //     countingBF::CBF cbf = countingBF::CBF(1000, 5);
-//     std::string expected_error = "`query.length()` (which is " + std::to_string(query.length()) + ") < `K` (which is " + std::to_string(K) + ")";
+//     std::string expected_error = "`query.length()` (which is " + std::to_string(query.length()) + ") < `k` (which is " + std::to_string(k) + ")";
 //
 //     try {
-//         std::vector<int> res = finderec(cbf, query, K, z, false);
+//         std::vector<int> res = finderec(cbf, query, k, z, false);
 //         FAIL() << "Expected std::range_error";
 //     } catch (std::range_error const& err) {
 //         EXPECT_EQ(err.what(), expected_error);
@@ -73,46 +73,46 @@ TEST(fimpera_test_suite_finderec, minElemInWindow) {
 // }
 
 TEST(fimpera_test_suite_finderec, negative_stretch_size1) {
-    int K = 31;
+    int k = 31;
     int z = 0;
     std::string query = "ACTTTTTTTTTTTCGGTGCTGCTTAGGATAA";
     std::vector<int> expected = {0};
     countingBF::CBF cbf = countingBF::CBF(1000, 5);
 
-    std::vector<int> res = finderec(cbf, query, K, z, false);
+    std::vector<int> res = finderec(cbf, query, k, z, false);
 
     EXPECT_EQ(res, expected);
 }
 
 TEST(fimpera_test_suite_finderec, negative_stretch_size9) {
-    int K = 31;
+    int k = 31;
     int z = 0;
     std::string query = "ACTTTTTTTTTTTCGGTGCTGCTTAGGATAAGAAAAAAA";
     std::vector<int> expected = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     countingBF::CBF cbf = countingBF::CBF(1000, 5);
 
-    std::vector<int> res = finderec(cbf, query, K, z, false);
+    std::vector<int> res = finderec(cbf, query, k, z, false);
 
     EXPECT_EQ(res, expected);
 }
 
 TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_1) {
     // no influence of a single positive kmer
-    int K = 12;
+    int k = 12;
     int z = 3;
     std::string query = "0123456789ABCDEFGHIJKL";
     std::vector<int> expected = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     countingBF::CBF cbf = countingBF::CBF(1000, 5);
     cbf.set("123456789");
 
-    std::vector<int> res = finderec(cbf, query, K, z, false);
+    std::vector<int> res = finderec(cbf, query, k, z, false);
 
     EXPECT_EQ(res, expected);
 }
 
 TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_2) {
     // be able to find a stretch
-    int K = 12;
+    int k = 12;
     int z = 3;
     std::string query = "0123456789ABCDEFGHIJKL";
     std::vector<int> expected = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -122,14 +122,14 @@ TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_2) {
     cbf.set("3456789AB");
     cbf.set("456789ABC");
 
-    std::vector<int> res = finderec(cbf, query, K, z, false);
+    std::vector<int> res = finderec(cbf, query, k, z, false);
 
     EXPECT_EQ(res, expected);
 }
 
 TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_3) {
     // be able to find a stretch and its abundance
-    int K = 12;
+    int k = 12;
     int z = 3;
     std::string query = "0123456789ABCDEFGHIJKL";
     std::vector<int> expected = {0, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0};
@@ -143,14 +143,14 @@ TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_3) {
     cbf.set("789ABCDEF");
     cbf.set("9ABCDEFGH");
 
-    std::vector<int> res = finderec(cbf, query, K, z, false);
+    std::vector<int> res = finderec(cbf, query, k, z, false);
 
     EXPECT_EQ(res, expected);
 }
 
 TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_4) {
     // be able to find a stretch and its abundance
-    int K = 12;
+    int k = 12;
     int z = 3;
     std::string query = "0123456789ABCDEFGHIJKL";
     std::vector<int> expected = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1};
@@ -161,13 +161,13 @@ TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_4) {
     cbf.set("CDEFGHIJK");
     cbf.set("DEFGHIJKL");
 
-    std::vector<int> res = finderec(cbf, query, K, z, false);
+    std::vector<int> res = finderec(cbf, query, k, z, false);
 
     EXPECT_EQ(res, expected);
 }
 TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_5) {
     // be able to find a stretch and its abundance
-    int K = 12;
+    int k = 12;
     int z = 3;
     std::string query = "0123456789ABCDEFGHIJKL";
     std::vector<int> expected = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1};
@@ -179,13 +179,13 @@ TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_5) {
     cbf.set("CDEFGHIJK");
     cbf.set("DEFGHIJKL");
 
-    std::vector<int> res = finderec(cbf, query, K, z, false);
+    std::vector<int> res = finderec(cbf, query, k, z, false);
 
     EXPECT_EQ(res, expected);
 }
 TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_6) {
     // be able to find a stretch and its abundance
-    int K = 12;
+    int k = 12;
     int z = 3;
     std::string query = "0123456789ABCDEFGHIJKL";
     std::vector<int> expected = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1};
@@ -198,7 +198,7 @@ TEST(fimpera_test_suite_finderec, negative_and_positive_stretch_6) {
     cbf.set("CDEFGHIJK");
     cbf.set("DEFGHIJKL");
 
-    std::vector<int> res = finderec(cbf, query, K, z, false);
+    std::vector<int> res = finderec(cbf, query, k, z, false);
 
     EXPECT_EQ(res, expected);
 }
@@ -210,13 +210,13 @@ TEST(fimpera_test_suite_finderec, test_sliding_window_minimum) {
     EXPECT_EQ(out, expectation);
 }
 
-inline std::vector<int> sliding_window_minimum_pierre(const std::vector<int>& ARR, int K) {
+inline std::vector<int> sliding_window_minimum_pierre(const std::vector<int>& ARR, int k) {
     std::vector<int> res;
-    res.reserve(ARR.size() - K + 1);
+    res.reserve(ARR.size() - k + 1);
     int min = ARR[0];
     std::size_t i_min = 0;
 
-    for (int j = 1; j < K; j++) {
+    for (int j = 1; j < k; j++) {
         if (ARR[j] < min) {
             min = ARR[j];
             i_min = j;
@@ -224,11 +224,11 @@ inline std::vector<int> sliding_window_minimum_pierre(const std::vector<int>& AR
     }
     res.push_back(min);
 
-    for (std::size_t i = K; i < ARR.size(); i++) {
-        if (i_min == i - K) {
-            i_min = i - K + 1;
+    for (std::size_t i = k; i < ARR.size(); i++) {
+        if (i_min == i - k) {
+            i_min = i - k + 1;
             min = ARR[i_min];
-            for (std::size_t j = i - K + 2; j < i; j++) {
+            for (std::size_t j = i - k + 2; j < i; j++) {
                 if (ARR[j] < min) {
                     i_min = j;
                     min = ARR[i_min];
@@ -244,14 +244,14 @@ inline std::vector<int> sliding_window_minimum_pierre(const std::vector<int>& AR
     return res;
 }
 
-inline std::vector<int> sliding_window_minimum_naive(const std::vector<int>& ARR, int K) {
+inline std::vector<int> sliding_window_minimum_naive(const std::vector<int>& ARR, int k) {
     std::vector<int> res;
 
-    for (std::size_t j = 0; j < ARR.size() - K + 1; j++) {  // j : start of the window
+    for (std::size_t j = 0; j < ARR.size() - k + 1; j++) {  // j : start of the window
         int min = ARR[j];
-        for (std::size_t k = j; k < j + K; k++) {  // k : current position in the tab
-            if (ARR[k] < min) {
-                min = ARR[k];
+        for (std::size_t s = j; s < j + k; s++) {  // s : current position in the tab
+            if (ARR[s] < min) {
+                min = ARR[s];
             }
         }
         res.push_back(min);
@@ -259,14 +259,14 @@ inline std::vector<int> sliding_window_minimum_naive(const std::vector<int>& ARR
     return res;
 }
 
-// inline std::vector<int> sliding_window_minimum_1(const std::vector<int>& ARR, int K) {
+// inline std::vector<int> sliding_window_minimum_1(const std::vector<int>& ARR, int k) {
 //     std::deque<std::pair<int, int>> window;  // pair<int, int> represents the pair (ARR[i], i)
 //     std::vector<int> result;
-//     assert(ARR.size() >= K);
-//     result.reserve(ARR.size() - K);  // TODO: mesurer l'apport de ça, je suis curieux
+//     assert(ARR.size() >= k);
+//     result.reserve(ARR.size() - k);  // TODO: mesurer l'apport de ça, je suis curieux
 
 //     // initialisation step
-//     for (int i = 0; i < (K - 1); i++) {
+//     for (int i = 0; i < (k - 1); i++) {
 //         // clear the deque of the element higher than the current one
 //         while (!window.empty() && window.back().first >= ARR[i]) {
 //             window.pop_back();
@@ -274,19 +274,19 @@ inline std::vector<int> sliding_window_minimum_naive(const std::vector<int>& ARR
 //         // add the current element
 //         window.push_back(std::make_pair(ARR[i], i));
 //         // get rid of the "old" elements
-//         while (window.front().second <= i - K) {
+//         while (window.front().second <= i - k) {
 //             window.pop_front();
 //         }
 //     }
 
 //     // same, but we add the values to the vector
 //     // TODO this segfaults
-//     for (std::size_t i = (K - 1); i < ARR.size(); i++) {
+//     for (std::size_t i = (k - 1); i < ARR.size(); i++) {
 //         while (!window.empty() && window.back().first >= ARR[i]) {
 //             window.pop_back();
 //         }
 //         window.push_back(std::make_pair(ARR[i], i));
-//         while (window.front().second <= i - K) {
+//         while (window.front().second <= i - k) {
 //             std::cout << "start loop " << window.empty() << std::endl;
 //             window.pop_front();
 //             std::cout << "window " << window.front().first << " " << window.front().second << std::endl;
@@ -298,14 +298,14 @@ inline std::vector<int> sliding_window_minimum_naive(const std::vector<int>& ARR
 //     return result;
 // }
 
-inline std::vector<int> sliding_window_minimum_2(const std::vector<int>& ARR, int K) {
+inline std::vector<int> sliding_window_minimum_2(const std::vector<int>& ARR, int k) {
     std::vector<int> window_val(ARR.size());
     std::vector<std::size_t> window_i(ARR.size());
     std::size_t ind_min = 0;
     std::size_t ind_max = 0;
     std::vector<int> result;
-    assert(ARR.size() >= K);
-    result.reserve(ARR.size() - K);  // TODO: how much does that actually impact performance ?
+    assert(ARR.size() >= k);
+    result.reserve(ARR.size() - k);  // TODO: how much does that actually impact performance ?
 
     for (std::size_t i = 0; i < ARR.size(); i++) {
         while ((ind_max > ind_min) && window_val[ind_max - 1] >= ARR[i]) {
@@ -316,11 +316,11 @@ inline std::vector<int> sliding_window_minimum_2(const std::vector<int>& ARR, in
         window_i[ind_max] = i;
         ind_max++;
 
-        while (window_i[ind_min] <= i - K) {
+        while (window_i[ind_min] <= i - k) {
             ind_min++;
         }
 
-        if (i >= K - 1) {
+        if (i >= k - 1) {
             result.push_back(window_val[ind_min]);
         }
     }

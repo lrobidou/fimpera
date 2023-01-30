@@ -19,11 +19,11 @@ class fimpera {
     std::string _strategy;
 
    public:
-    fimpera(const std::string& filename, const int& K, const int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets = 1);
+    fimpera(const std::string& filename, const int& k, const int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets = 1);
     template <typename U>
-    fimpera(const U& strategyWrapper, const std::string& filename, const int& K, const int& z, bool canonical, uint64_t nbBits);
+    fimpera(const U& strategyWrapper, const std::string& filename, const int& k, const int& z, bool canonical, uint64_t nbBits);
     template <typename U>
-    fimpera(const U& strategyWrapper, const std::string& filename, const int& K, const int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets);
+    fimpera(const U& strategyWrapper, const std::string& filename, const int& k, const int& z, bool canonical, uint64_t nbBits, uint64_t nbBuckets);
     fimpera(const std::string& filename);
     void query(const std::string& filename, CustomResponse& response) const;
     std::vector<int> queryRead(const std::string& read) const;

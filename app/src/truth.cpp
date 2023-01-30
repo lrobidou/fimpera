@@ -168,11 +168,11 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
     return str;
 }
 
-void compareWithTruth(const std::string& indexFilenameTemplate, const std::string& KMCFilename, const std::string& queryFile, uint64_t size, uint64_t nbBuckets, std::size_t K) {
+void compareWithTruth(const std::string& indexFilenameTemplate, const std::string& KMCFilename, const std::string& queryFile, uint64_t size, uint64_t nbBuckets, std::size_t k) {
     const std::vector<int> zs = {0, 1, 2, 3, 4, 5, 6, 10, 12, 15, 18, 21, 24, 27, 30};
     auto start = std::chrono::steady_clock::now();
 
-    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, K, 0, false, size, nbBuckets);
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, k, 0, false, size, nbBuckets);
     std::cout << "index truth in (ms)=" << since(start).count() << std::endl;
 
     for (int z : zs) {
@@ -180,13 +180,13 @@ void compareWithTruth(const std::string& indexFilenameTemplate, const std::strin
         std::cout << "starting analyzing z = " << z << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
 
         std::string indexFilename = ReplaceAll(indexFilenameTemplate, "_z_", "_z" + std::to_string(z) + "_");
-        indexFilename = ReplaceAll(indexFilename, "_k_", "_k" + std::to_string(K) + "_");
+        indexFilename = ReplaceAll(indexFilename, "_k_", "_k" + std::to_string(k) + "_");
         std::cout << "index filename " << indexFilename << std::endl;
 
         fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(indexFilename);
         std::cout << "index BF in (ms)=" << since(start_of_this_z).count() << std::endl;
 
-        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, K, index.getz(), false, size, nbBuckets);
+        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(KMCFilename, k, index.getz(), false, size, nbBuckets);
         std::cout << "index ctruth in (ms)=" << since(start_of_this_z).count() << std::endl;
 
         queryLowMemory(index, truth, ctruth, queryFile);

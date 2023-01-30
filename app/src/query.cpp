@@ -5,7 +5,7 @@
 #include "args.hpp"
 
 class BiologicalDataPrinter : public CustomResponse {
-    void processResult(const std::vector<int>& res, const unsigned int& K, const std::string& current_header, const std::string& current_read) {
+    void processResult(const std::vector<int>& res, const unsigned int& k, const std::string& current_header, const std::string& current_read) {
         std::cout << current_header << '\n';
         std::size_t i = 0;
 

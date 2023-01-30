@@ -12,10 +12,10 @@ int main(int argc, char* argv[]) {
     program.add_argument("output_filename").help("output index name");
     program.add_argument("size").help("output index size").scan<'i', std::size_t>();
     // optional arguments
-    program.add_argument("-K").help("size of Kmers").default_value(31).scan<'i', int>();
+    program.add_argument("-k").help("size of kmers").default_value(31).scan<'i', int>();
     program.add_argument("-z").help("value of z (cf paper of findere)").default_value(3).scan<'i', int>();
     program.add_argument("-b").help("number of bit per bucket in the output index").default_value(5).scan<'i', int>();
-    program.add_argument("--canonical").help("will fimpera index canonical Kmers ?").default_value(false).implicit_value(true);
+    program.add_argument("--canonical").help("will fimpera index canonical kmers ?").default_value(false).implicit_value(true);
 
     parse(program, argc, argv);
     // create the filter
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     abundanceToIdentifierStrategy::log2 logStrategy = abundanceToIdentifierStrategy::log2();
 
     fimpera<countingBF::CBF>
-        f(program.get("input_filename"), program.get<int>("-K"), program.get<int>("-z"), program["--canonical"] == true, program.get<std::size_t>("size"), program.get<int>("-b"));
+        f(program.get("input_filename"), program.get<int>("-k"), program.get<int>("-z"), program["--canonical"] == true, program.get<std::size_t>("size"), program.get<int>("-b"));
     // save it
     f.save(program.get("output_filename"));
 

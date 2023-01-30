@@ -330,24 +330,24 @@ inline std::string ReplaceAll(std::string str, const std::string& from, const st
 }
 
 template <typename Strategy>
-void compareWithTruth(const std::string& KMCFilename, const std::string& queryFile, uint64_t size, std::size_t K, int b, Strategy strategy, bool wrongKmersToAFile) {
+void compareWithTruth(const std::string& KMCFilename, const std::string& queryFile, uint64_t size, std::size_t k, int b, Strategy strategy, bool wrongKmersToAFile) {
     const std::vector<int> zs = {5};
     auto start = std::chrono::steady_clock::now();
 
-    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, 0, false, size, b);
-    fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_truth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, 0, false, size, b);
-    fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(strategy, KMCFilename, K, 0, false, size, b);
+    fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_truth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, k, 0, false, size, b);
+    fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_truth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, k, 0, false, size, b);
+    fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(strategy, KMCFilename, k, 0, false, size, b);
     std::cout << "index truth in (ms)=" << since(start).count() << std::endl;
 
     for (int z : zs) {
         auto start_of_this_z = std::chrono::steady_clock::now();
         std::cout << "starting analyzing z = " << z << " after " << std::chrono::duration<double>(start_of_this_z - start).count() << " s." << std::endl;
-        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, z, false, size, b);
-        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, K, z, false, size, b);
-        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, K, z, false, size, b);
+        fimpera<UnlimitedTruthInTheShapeOfAnAMQ> unlimited_ctruth = fimpera<UnlimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, k, z, false, size, b);
+        fimpera<LimitedTruthInTheShapeOfAnAMQ> limited_ctruth = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, KMCFilename, k, z, false, size, b);
+        fimpera<countingBF::CBF> index_z = fimpera<countingBF::CBF>(strategy, KMCFilename, k, z, false, size, b);
 
         // std::string indexFilename = ReplaceAll(indexFilenameTemplate, "_z_", "_z" + std::to_string(z) + "_");
-        // indexFilename = ReplaceAll(indexFilename, "_k_", "_k" + std::to_string(K) + "_");
+        // indexFilename = ReplaceAll(indexFilename, "_k_", "_k" + std::to_string(k) + "_");
         // std::cout << "index filename " << indexFilename << std::endl;
 
         // fimpera<countingBF::CBF> index = fimpera<countingBF::CBF>(indexFilename);
@@ -365,7 +365,7 @@ int main(int argc, char* argv[]) {
     program.add_argument("kmc_filename").help("kmc file that contains the truth for the Kmers");
     program.add_argument("size").help("output index size").scan<'i', std::size_t>();
 
-    program.add_argument("-K").help("size of Kmers").default_value(31).scan<'i', int>();
+    program.add_argument("-k").help("size of Kmers").default_value(31).scan<'i', int>();
     // program.add_argument("-z").help("value of z (cf paper of findere)").default_value(3).scan<'i', int>();
     program.add_argument("b").help("the number of bits per buckets in the filter").scan<'i', int>();
     program.add_argument("--file").help("should kmers answered wrongly be printed to file").default_value(false).implicit_value(true);
@@ -377,12 +377,12 @@ int main(int argc, char* argv[]) {
     const std::string kmc_filename = program.get("kmc_filename");
     const std::size_t size = program.get<std::size_t>("size");
     const int b = program.get<int>("b");
-    const int K = program.get<int>("-K");
+    const int k = program.get<int>("-k");
     bool wrongKmersToAFile = program.get<bool>("--file");
     std::cout << "wrongKmersToAFile : " << wrongKmersToAFile << std::endl;
     // const int z = program.get<int>("-z");
     // abundanceToIdentifierStrategy::identity idStrategy = abundanceToIdentifierStrategy::identity();
     abundanceToIdentifierStrategy::log2 logStrategy = abundanceToIdentifierStrategy::log2();
 
-    compareWithTruth(kmc_filename, query_filename, size, K, b, logStrategy, wrongKmersToAFile);
+    compareWithTruth(kmc_filename, query_filename, size, k, b, logStrategy, wrongKmersToAFile);
 }

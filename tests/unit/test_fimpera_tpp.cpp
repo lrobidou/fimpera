@@ -13,7 +13,7 @@ class ResultGetter : public CustomResponse {
     ResultGetter() {}
 
     void
-    processResult(const std::vector<int>& res, const unsigned int& K, const std::string& current_header, const std::string& current_read) {
+    processResult(const std::vector<int>& res, const unsigned int& k, const std::string& current_header, const std::string& current_read) {
         entireResponse.insert(std::end(entireResponse), std::begin(res), std::end(res));
     }
 
