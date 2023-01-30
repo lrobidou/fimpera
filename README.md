@@ -96,7 +96,7 @@ T   A   C   A   C   C   G   G   A   C   A   C   G   G   G   A   T   T   G   G   
 0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1
 ```
 
-Under each letter (base), the abundance of the kmer starting from this position is displayed. The abundance is displayed as -1 if the complexity of the kmer is too low. Here a unique kmer has a non zero abundance. This is kmer `AAAGAGCTGGAACGTGAAAATCGTGAACTGCGCCG`.
+Under each letter (base), the abundance of the kmer starting from this position is displayed. The abundance is displayed as -1 if the complexity of the kmer is too low. Here a unique kmer has a non zero abundance. This is kmer `AAAGAGCTGGAACGTGAAAATCGTGAACTGCGCCG` with abundance 13.
 
 # Using fimpera with a personal counting Approximate Membership Query data structure
 Explanation of fimpera headers can be found [here](lib/include/fimpera-lib/README.md)
