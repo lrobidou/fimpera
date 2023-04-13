@@ -12,7 +12,7 @@ to let git update the submodules.
 ```
 git clone --recursive https://github.com/lrobidou/fimpera  # download fimpera
 cd fimpera
-git checkout paper  # change branch to the 'apper' branch
+git checkout paper  # change branch to the 'paper' branch
 git submodule update --init --recursive  # update submodules
 chmod +x install.sh
 ./install.sh
