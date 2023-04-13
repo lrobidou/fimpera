@@ -10,7 +10,7 @@
 
 <!-- TODO image -->
 
-The `fimpera` implementation proposed here uses a counting Bloom filter. It proposes a way to index and query Kmers from biological sequences (fastq or fasta, gzipped or not). <!-- , possibly considering only canonical Kmers). (TODO: code and check)--> <!-- or from any textual data (TODO code and check) -->
+The `fimpera` implementation proposed here uses a counting Bloom filter. It proposes a way to index and query k-mers from biological sequences (fastq or fasta, gzipped or not). <!-- , possibly considering only canonical Kmers). (TODO: code and check)--> <!-- or from any textual data (TODO code and check) -->
 
 `fimpera` relies on templates, hence it can be easily adapted to any other AMQ that supports abundance queries, for any usage.
 
@@ -49,7 +49,7 @@ cd fimpera
 <!-- TODO -->
 ## Running
 **note:**  
-`fimpera` needs a file containing the abundance of each Kmers to index them (each line should contain a Kmer (not a kmer), one tab and the abundance associated with that Kmer). KMC can provide such file, however you are free to use another kmer counter program.
+`fimpera` needs a file containing the abundance of each k-mers to index them (each line should contain a k-mer (not a s-mer), one tab and the abundance associated with that k-mer). KMC can provide such file, however you are free to use another kmer counter program.
 ### Overview
 
 ```bash
