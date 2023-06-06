@@ -118,7 +118,7 @@ Lucas Robidou: lucas.robidou@inria.fr
 Pierre Peterlongo: pierre.peterlongo@inria.fr
 
 ## Citation
-Robidou, Lucas, and Pierre Peterlongo. "fimpera: drastic improvement of Approximate Membership Query data-structures with counts." [bioRxiv (2022): 2022-06](https://www.biorxiv.org/content/10.1101/2022.06.27.497694.abstract).
+Robidou, Lucas, and Pierre Peterlongo. "[fimpera: drastic improvement of Approximate Membership Query data-structures with counts.](https://academic.oup.com/bioinformatics/article/39/5/btad305/7169157)" Bioinformatics 39.5 (2023): btad305 
 
 <!-- ## Reproduce paper results -->
 <!-- TODO -->
