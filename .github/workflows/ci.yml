@@ -61,12 +61,12 @@ jobs:
         run: |
           cd build && make coverage-report
 
-      - name: Codecov
-        if: matrix.compiler == 'g++-10' && matrix.build_type == 'Coverage'
-        uses: codecov/codecov-action@v1.0.3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ${{runner.workspace}}/build/coverage_reports.info
+      # - name: Codecov
+      #   if: matrix.compiler == 'g++-10' && matrix.build_type == 'Coverage'
+      #   uses: codecov/codecov-action@v1.0.3
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     file: ${{runner.workspace}}/build/coverage_reports.info
 
   MacOS:
     runs-on: macos-10.15
@@ -145,9 +145,9 @@ jobs:
         run: |
           cd build && make coverage-report
 
-      - name: Codecov
-        if: matrix.compiler == 'g++-10' && matrix.build_type == 'Coverage'
-        uses: codecov/codecov-action@v1.0.3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ${{ runner.workspace }}/cpp-app-template/build/coverage_reports.info.filtered
+      # - name: Codecov
+      #   if: matrix.compiler == 'g++-10' && matrix.build_type == 'Coverage'
+      #   uses: codecov/codecov-action@v1.0.3
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     file: ${{ runner.workspace }}/cpp-app-template/build/coverage_reports.info.filtered
