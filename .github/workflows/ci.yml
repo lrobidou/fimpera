@@ -69,7 +69,7 @@ jobs:
       #     file: ${{runner.workspace}}/build/coverage_reports.info
 
   MacOS:
-    runs-on: macos-11
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
