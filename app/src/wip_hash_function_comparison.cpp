@@ -100,6 +100,9 @@ double getAverage(std::vector<T> const& v) {
 
 template <typename Strategy>
 void compareSmersAndKmers_in_cBF(const std::string& kmc_filename_kmers, const std::string& kmc_filename_smers, std::size_t size, int b, Strategy strategy, const std::string& filename_query) {
+    bool _canonical = true;
+    auto start = std::chrono::steady_clock::now();
+
     fimpera<LimitedTruthInTheShapeOfAnAMQ> truth_k = fimpera<LimitedTruthInTheShapeOfAnAMQ>(strategy, kmc_filename_kmers, 31, 0, true, size, b, 1);
     // fimpera<countingBF::CBF> cbf_k = fimpera<>(strategy, kmc_filename_kmers, 31, 0, true, size, b, 1);
     fimpera<countingBF::CBF> cbf_k = fimpera<countingBF::CBF>(strategy, kmc_filename_kmers, 31, 2, true, size, b, 1);

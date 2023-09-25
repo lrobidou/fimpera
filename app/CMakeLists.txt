@@ -52,3 +52,28 @@ target_link_libraries(fimpera_ctruth_abundance_histogram ${LIBRARY_NAME} ${APP_L
 add_executable(fimpera_smers_comparison ${APP_SOURCE_DIR}/smers_comparison.cpp)
 add_dependencies(fimpera_smers_comparison ${APP_DEPENDENCIES})
 target_link_libraries(fimpera_smers_comparison ${LIBRARY_NAME} ${APP_LINK} z)
+
+add_executable(fimpera_size_comparison ${APP_SOURCE_DIR}/size_comparison.cpp)
+add_dependencies(fimpera_size_comparison ${APP_DEPENDENCIES})
+target_link_libraries(fimpera_size_comparison ${LIBRARY_NAME} ${APP_LINK} z)
+
+add_executable(no_log ${APP_SOURCE_DIR}/no_log.cpp)
+add_dependencies(no_log ${APP_DEPENDENCIES})
+target_link_libraries(no_log ${LIBRARY_NAME} ${APP_LINK} z)
+
+add_executable(hash_function_comparison ${APP_SOURCE_DIR}/hash_function_comparison.cpp)
+add_dependencies(hash_function_comparison ${APP_DEPENDENCIES})
+target_link_libraries(hash_function_comparison ${LIBRARY_NAME} ${APP_LINK} z)
+
+add_executable(speed_comparisons_wrt_s ${APP_SOURCE_DIR}/speed_comparisons_wrt_s.cpp)
+add_dependencies(speed_comparisons_wrt_s ${APP_DEPENDENCIES})
+target_link_libraries(speed_comparisons_wrt_s ${LIBRARY_NAME} ${APP_LINK} z)
+
+add_executable(speed_comparisons_wrt_k ${APP_SOURCE_DIR}/speed_comparisons_wrt_k.cpp)
+add_dependencies(speed_comparisons_wrt_k ${APP_DEPENDENCIES})
+target_link_libraries(speed_comparisons_wrt_k ${LIBRARY_NAME} ${APP_LINK} z)
+
+
+add_executable(fp_comparisons_wrt_k ${APP_SOURCE_DIR}/fp_comparisons_wrt_k.cpp)
+add_dependencies(fp_comparisons_wrt_k ${APP_DEPENDENCIES})
+target_link_libraries(fp_comparisons_wrt_k ${LIBRARY_NAME} ${APP_LINK} z)
