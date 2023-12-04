@@ -4,6 +4,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <stdint.h>
 /**
     @file ex_lib.hpp
 */
