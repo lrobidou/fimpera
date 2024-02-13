@@ -5,6 +5,10 @@
 
 #include "args.hpp"
 
+#include <iostream>
+#include <chrono>
+#include <ctime> 
+
 int main(int argc, char* argv[]) {
     argparse::ArgumentParser program("fimpera_index", "0.0.1");
     // mandatory arguments
@@ -23,10 +27,20 @@ int main(int argc, char* argv[]) {
     abundanceToIdentifierStrategy::identity idStrategy = abundanceToIdentifierStrategy::identity();
     abundanceToIdentifierStrategy::log2 logStrategy = abundanceToIdentifierStrategy::log2();
 
+    auto start = std::chrono::system_clock::now();
+    
     fimpera<countingBF::CBF>
         f(program.get("input_filename"), program.get<int>("-k"), program.get<int>("-z"), program["--canonical"] == true, program.get<std::size_t>("size"), program.get<int>("-b"));
+    
+    auto half = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds_index = half-start;
+    std::cout << "time to index = " << elapsed_seconds_index.count() << std::endl;
+    
     // save it
     f.save(program.get("output_filename"));
-
+    
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds_dump = end-start;
+    std::cout << "time to index and dump = " << elapsed_seconds_dump.count() << std::endl;
     return 0;
 }

@@ -28,6 +28,7 @@ fimpera<T>::fimpera(const std::string& filename, const int& K, const int& z, boo
 
     std::string line;
     std::string kmer;
+
     while (std::getline(myFile, line)) {  // \n are removed
         std::string Kmer;
         std::string abundanceStr;
@@ -64,7 +65,6 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
     this->_strategy = strategyWrapper.name();
     // this->_strategy = "log2";
 
-    // std::cout << "in fimpera constructor " << nbBits << std::endl; // TODO: remove
     std::ifstream myFileGz(filename);
     zstr::istream myFile(myFileGz);
 
@@ -105,7 +105,6 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
     checkExists(filename);
     this->_strategy = strategyWrapper.name();
 
-    // std::cout << "in fimpera constructor " << nbBits << std::endl; // TODO: remove
     std::ifstream myFileGz(filename);
     zstr::istream myFile(myFileGz);
 
@@ -141,7 +140,6 @@ fimpera<T>::fimpera(const U& strategyWrapper, const std::string& filename, const
 
 template <typename T>
 fimpera<T>::fimpera(const std::string& filename) {
-    // std::cout << "loading fimpera from filename: " << filename << std::endl;//TODO log
     if (!fileExists(filename)) {
         std::string msg = "The file " + filename + " does not exist.";
         throw std::runtime_error(msg);
@@ -156,9 +154,7 @@ fimpera<T>::fimpera(const std::string& filename) {
     // get the JSON back from the index
     std::string jsonStr = getFromFile<std::string>(fin);
 
-    // get  the strategy back from the index
-    // std::cout << j.at("strategy") << std::endl;
-
+    // get the strategy back from the index
     if (jsonStr.length() != 0) {
         nlohmann::json j = nlohmann::json::parse(jsonStr);
         if (j.contains("strategy")) {

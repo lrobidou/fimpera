@@ -47,6 +47,7 @@ std::tuple<std::vector<uint64_t>, uint64_t> CBF::get(const std::vector<uint64_t>
 }
 
 CBF::CBF(uint64_t nbBits, uint64_t nbBitsPerCell, uint64_t nbHashFunctions) : _bits(nbBits, false), _nbBitsPerCell(nbBitsPerCell), _nbHashFunctions(nbHashFunctions) {
+    // std::cout << "constructing a CBF, nb_bits = " << nbBits << std::endl;
     assert(nbBits > 0);
     _mask = pow(2, _nbBitsPerCell - 1);
     _nbCells = nbBits / _nbBitsPerCell;
@@ -73,17 +74,70 @@ CBF::CBF(std::ifstream& fin) {
     std::vector<bool>::size_type n;
     fin.read((char*)&n, sizeof(std::vector<bool>::size_type));
     _bits.resize(n);
-    // this part is ugly, but it works (tm)
-    // basically, iterate through the data on stream byte by byte and add it in the filter bit by bit
-    std::vector<bool>::size_type i = 0;
-    while (i < n) {
-        // get the next byte from the stream
-        unsigned char aggr;
-        fin.read((char*)&aggr, sizeof(unsigned char));
-        // we have a byte to store in the filter
-        // let's select its bits one by one and place them in the filter
-        for (unsigned char mask = 1; mask > 0 && i < n; ++i, mask <<= 1)
-            _bits.at(i) = aggr & mask;
+
+    // Buffer size (adjust as needed)
+    const int bufferSize = 8192;
+    char buffer[bufferSize];
+
+
+    uint64_t i = 0;
+    uint64_t nb_buffer_parsed = 0;
+    uint64_t nb_buffers_filled = n / (bufferSize*8);
+    uint64_t nb_bits_in_incomplete_buffer = n % (bufferSize*8);
+    // Read from the file into the buffer
+    while (nb_buffer_parsed < nb_buffers_filled) {
+        fin.read(buffer, bufferSize);
+        nb_buffer_parsed++;
+
+        // Process the buffer and extract boolean values
+        for (int buffer_index = 0; buffer_index < bufferSize; buffer_index += sizeof(uint64_t)) {
+            uint64_t packedBits;
+            std::memcpy(&packedBits, &buffer[buffer_index], sizeof(uint64_t));
+
+            // Unpack boolean values from packedBits
+            for (int j = 0; j < 64; ++j) {
+                _bits.at(i) = ((packedBits >> j) & 1);
+                i++;
+            }
+        }
+    }
+
+    
+    if (nb_bits_in_incomplete_buffer > 0) {
+        // anything multiple of 64 ?
+        uint64_t bufferIndex = (nb_bits_in_incomplete_buffer / 64);
+        // anything not multiple of 64 ?
+        uint64_t nb_bits_lefts_in_last_buffer = (nb_bits_in_incomplete_buffer % 64);
+
+        // 8 bits per buffer
+        bufferIndex *= 8;
+        
+        if (bufferIndex > 0) {
+            fin.read(buffer, bufferIndex);
+            for (int buffer_index = 0; buffer_index < bufferIndex; buffer_index += sizeof(uint64_t)) {
+                uint64_t packedBits;
+                std::memcpy(&packedBits, &buffer[buffer_index], sizeof(uint64_t));
+                
+                for (int j = 0; j < 64; ++j) {
+                    _bits.at(i) = ((packedBits >> j) & 1);
+                    i++;
+                }
+            }
+        }
+
+
+        if (nb_bits_lefts_in_last_buffer>0) {
+            uint64_t packedBits;
+            fin.read(buffer, 8);
+            std::memcpy(&packedBits, &buffer[0], sizeof(uint64_t));
+            
+            uint64_t j= 0;
+            while (i<n) {
+                _bits.at(i) = ((packedBits >> j) & 1);
+                i++;
+                j++;
+            }
+        }
     }
 }
 

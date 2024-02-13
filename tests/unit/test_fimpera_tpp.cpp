@@ -69,6 +69,52 @@ TEST(fimpera_test_suite_files, fimpera_save) {
     EXPECT_TRUE(f2 == f3);
 }
 
+TEST(fimpera_test_suite_files, fimpera_save_and_load_81923) {
+    const std::string filenameToSaveTo = "../../tests/unit/data/test1000Lines_from_unit_test.idx";
+    const std::string input_filename = "../../tests/unit/data/1000LinesTest.txt";
+
+    fimpera<countingBF::CBF> f1 = fimpera<countingBF::CBF>(input_filename, 35, 3, false, 81923, 5);
+    f1.save(filenameToSaveTo);
+    fimpera<countingBF::CBF> f2 = fimpera<countingBF::CBF>(filenameToSaveTo);
+
+    EXPECT_TRUE(f1 == f2);
+}
+
+
+TEST(fimpera_test_suite_files, fimpera_save_and_load_15) {
+    const std::string filenameToSaveTo = "../../tests/unit/data/test1000Lines_from_unit_test.idx";
+    const std::string input_filename = "../../tests/unit/data/1000LinesTest.txt";
+
+    fimpera<countingBF::CBF> f1 = fimpera<countingBF::CBF>(input_filename, 35, 3, false, 15, 5);
+    f1.save(filenameToSaveTo);
+    fimpera<countingBF::CBF> f2 = fimpera<countingBF::CBF>(filenameToSaveTo);
+
+    EXPECT_TRUE(f1 == f2);
+}
+
+TEST(fimpera_test_suite_files, fimpera_save_and_load_64) {
+    const std::string filenameToSaveTo = "../../tests/unit/data/test1000Lines_from_unit_test.idx";
+    const std::string input_filename = "../../tests/unit/data/1000LinesTest.txt";
+
+    fimpera<countingBF::CBF> f1 = fimpera<countingBF::CBF>(input_filename, 35, 3, false, 64, 5);
+    f1.save(filenameToSaveTo);
+    fimpera<countingBF::CBF> f2 = fimpera<countingBF::CBF>(filenameToSaveTo);
+
+    EXPECT_TRUE(f1 == f2);
+}
+
+
+TEST(fimpera_test_suite_files, fimpera_save_and_load_89651) {
+    const std::string filenameToSaveTo = "../../tests/unit/data/test1000Lines_from_unit_test.idx";
+    const std::string input_filename = "../../tests/unit/data/1000LinesTest.txt";
+
+    fimpera<countingBF::CBF> f1 = fimpera<countingBF::CBF>(input_filename, 35, 3, false, 89651, 5);
+    f1.save(filenameToSaveTo);
+    fimpera<countingBF::CBF> f2 = fimpera<countingBF::CBF>(filenameToSaveTo);
+
+    EXPECT_TRUE(f1 == f2);
+}
+
 TEST(fimpera_test_suite_fimpera, fimpera_get_canonical) {
     const std::string filename = "../../tests/unit/data/1000LinesTest.txt";
     fimpera<countingBF::CBF> f = fimpera<countingBF::CBF>(filename, 35, 0, false, 10000, 5);  // random  size
