@@ -58,7 +58,6 @@ inline void writeToFile<std::vector<bool>>(std::ofstream& fout, const std::vecto
             // Check if the buffer is full
             if (bufferIndex == bufferSize) {
                 // Write the buffer to the file
-                std::cout << "Write the buffer to the file" << std::endl;
                 fout.write(buffer, bufferSize);
                 bufferIndex = 0;
             }
@@ -72,7 +71,7 @@ inline void writeToFile<std::vector<bool>>(std::ofstream& fout, const std::vecto
     }
 
     if (bufferIndex > 0) {
-        std::cout << "OVERFLOW: bufferIndex " << bufferIndex << std::endl;
+        // std::cout << "OVERFLOW: bufferIndex " << bufferIndex << std::endl;
         // while (bufferIndex < bufferSize) {
         //     buffer[bufferIndex] = 0;
         //     bufferIndex++;
